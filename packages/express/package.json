@@ -1,0 +1,35 @@
+{
+  "name": "@x402-response-encryption/express",
+  "version": "0.1.0",
+  "description": "Express middleware that adds x402 response encryption on top of @x402/express.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@x402-response-encryption/core": "0.1.0",
+    "@x402/core": "2.29.0",
+    "viem": "2.57.8"
+  },
+  "peerDependencies": {
+    "@x402/express": "2.29.0",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/express": "4.17.25",
+    "@types/node": "22.10.2",
+    "@x402/evm": "2.29.0",
+    "@x402/express": "2.29.0",
+    "@x402-response-encryption/fetch": "0.1.0",
+    "express": "4.22.3",
+    "typescript": "5.6.3",
+    "vitest": "2.1.8"
+  }
+}
