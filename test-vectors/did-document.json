@@ -1,0 +1,36 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
+  "id": "did:web:api.seller.example",
+  "verificationMethod": [
+    {
+      "id": "did:web:api.seller.example#payto-eip155-84532",
+      "type": "EcdsaSecp256k1RecoveryMethod2020",
+      "controller": "did:web:api.seller.example",
+      "blockchainAccountId": "eip155:84532:0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+    },
+    {
+      "id": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+      "type": "JsonWebKey2020",
+      "controller": "did:web:api.seller.example",
+      "publicKeyJwk": {
+        "kty": "EC",
+        "crv": "secp256k1",
+        "x": "erKJPvFnEBQcEwgHgdAnyAeLOnA3H7DCzzPc4LpsfOw",
+        "y": "HkbgZYvbU5RrhPpF2TgnnUZMQfBWcz5q2nAKWDBck0s"
+      },
+      "x402ResponseEncryption": {
+        "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+        "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+        "notBefore": 1793836800,
+        "notAfter": 1825372800,
+        "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+      }
+    }
+  ],
+  "keyAgreement": [
+    "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a"
+  ]
+}

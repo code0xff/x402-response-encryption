@@ -1,0 +1,14 @@
+{
+  "name": "x402-response-encryption-test-vectors",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "generate": "node generate.mjs"
+  },
+  "dependencies": {
+    "@noble/curves": "1.4.0",
+    "@noble/hashes": "1.4.0",
+    "viem": "2.21.0"
+  }
+}

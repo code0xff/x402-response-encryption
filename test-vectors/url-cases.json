@@ -1,0 +1,179 @@
+{
+  "cases": [
+    {
+      "description": "already canonical",
+      "input": "https://api.seller.example/v1/report?id=42",
+      "canonical": "https://api.seller.example/v1/report?id=42"
+    },
+    {
+      "description": "scheme and host case",
+      "input": "HTTPS://API.Seller.Example/v1/report",
+      "canonical": "https://api.seller.example/v1/report"
+    },
+    {
+      "description": "default https port",
+      "input": "https://api.seller.example:443/v1/report",
+      "canonical": "https://api.seller.example/v1/report"
+    },
+    {
+      "description": "default http port",
+      "input": "http://localhost:80/v1/report",
+      "canonical": "http://localhost/v1/report"
+    },
+    {
+      "description": "non-default port kept",
+      "input": "https://api.seller.example:8443/v1/report",
+      "canonical": "https://api.seller.example:8443/v1/report"
+    },
+    {
+      "description": "port leading zeros",
+      "input": "https://api.seller.example:0443/v1/report",
+      "canonical": "https://api.seller.example/v1/report"
+    },
+    {
+      "description": "empty port",
+      "input": "https://api.seller.example:/v1/report",
+      "canonical": "https://api.seller.example/v1/report"
+    },
+    {
+      "description": "trailing dot in host",
+      "input": "https://api.seller.example./v1/report",
+      "canonical": "https://api.seller.example/v1/report"
+    },
+    {
+      "description": "empty path",
+      "input": "https://api.seller.example",
+      "canonical": "https://api.seller.example/"
+    },
+    {
+      "description": "empty path with query",
+      "input": "https://api.seller.example?b=2&a=1",
+      "canonical": "https://api.seller.example/?b=2&a=1"
+    },
+    {
+      "description": "dot segments",
+      "input": "https://api.seller.example/v1/./tmp/../report",
+      "canonical": "https://api.seller.example/v1/report"
+    },
+    {
+      "description": "leading dot-dot",
+      "input": "https://api.seller.example/../v1/report",
+      "canonical": "https://api.seller.example/v1/report"
+    },
+    {
+      "description": "percent-encoded unreserved decoded",
+      "input": "https://api.seller.example/%7Euser/%41bc",
+      "canonical": "https://api.seller.example/~user/Abc"
+    },
+    {
+      "description": "percent hex uppercased",
+      "input": "https://api.seller.example/a%2fb?q=%e2%82%ac",
+      "canonical": "https://api.seller.example/a%2Fb?q=%E2%82%AC"
+    },
+    {
+      "description": "encoded dot segment rejected",
+      "input": "https://api.seller.example/v1/%2E%2E/report",
+      "error": "url_encoded_dot_segment"
+    },
+    {
+      "description": "encoded single dot rejected",
+      "input": "https://api.seller.example/v1/%2e/report",
+      "error": "url_encoded_dot_segment"
+    },
+    {
+      "description": "encoded dots inside segment kept",
+      "input": "https://api.seller.example/v1/a%2Eb/%2E%2E%2E",
+      "canonical": "https://api.seller.example/v1/a.b/..."
+    },
+    {
+      "description": "raw space and unicode encoded",
+      "input": "https://api.seller.example/a b/€",
+      "canonical": "https://api.seller.example/a%20b/%E2%82%AC"
+    },
+    {
+      "description": "trailing slash preserved",
+      "input": "https://api.seller.example/v1/report/",
+      "canonical": "https://api.seller.example/v1/report/"
+    },
+    {
+      "description": "double slash preserved",
+      "input": "https://api.seller.example/v1//report",
+      "canonical": "https://api.seller.example/v1//report"
+    },
+    {
+      "description": "query order preserved",
+      "input": "https://api.seller.example/r?z=1&a=2&m=3",
+      "canonical": "https://api.seller.example/r?z=1&a=2&m=3"
+    },
+    {
+      "description": "repeated keys keep position",
+      "input": "https://api.seller.example/r?a=2&b=1&a=1",
+      "canonical": "https://api.seller.example/r?a=2&b=1&a=1"
+    },
+    {
+      "description": "empty query dropped",
+      "input": "https://api.seller.example/r?",
+      "canonical": "https://api.seller.example/r"
+    },
+    {
+      "description": "empty pairs dropped",
+      "input": "https://api.seller.example/r?a=1&&b=2&",
+      "canonical": "https://api.seller.example/r?a=1&b=2"
+    },
+    {
+      "description": "key without value",
+      "input": "https://api.seller.example/r?flag&a=1",
+      "canonical": "https://api.seller.example/r?flag&a=1"
+    },
+    {
+      "description": "plus kept literal",
+      "input": "https://api.seller.example/r?q=a+b",
+      "canonical": "https://api.seller.example/r?q=a+b"
+    },
+    {
+      "description": "equals inside value",
+      "input": "https://api.seller.example/r?q=a=b",
+      "canonical": "https://api.seller.example/r?q=a=b"
+    },
+    {
+      "description": "fragment dropped",
+      "input": "https://api.seller.example/r?a=1#section",
+      "canonical": "https://api.seller.example/r?a=1"
+    },
+    {
+      "description": "ipv6 host",
+      "input": "https://[2001:DB8::1]:443/r",
+      "canonical": "https://[2001:db8::1]/r"
+    },
+    {
+      "description": "userinfo rejected",
+      "input": "https://user:pw@api.seller.example/r",
+      "error": "url_userinfo_not_allowed"
+    },
+    {
+      "description": "non-ascii host rejected",
+      "input": "https://bücher.example/r",
+      "error": "url_non_ascii_host"
+    },
+    {
+      "description": "bad percent rejected",
+      "input": "https://api.seller.example/a%zz",
+      "error": "url_invalid_percent_encoding"
+    },
+    {
+      "description": "unsupported scheme rejected",
+      "input": "ftp://api.seller.example/r",
+      "error": "url_unsupported_scheme"
+    },
+    {
+      "description": "relative url rejected",
+      "input": "/v1/report",
+      "error": "url_not_absolute"
+    },
+    {
+      "description": "port out of range rejected",
+      "input": "https://api.seller.example:70000/r",
+      "error": "url_invalid_port"
+    }
+  ]
+}

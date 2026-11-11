@@ -1,0 +1,75 @@
+{
+  "description": "x402 response-encryption v1, EIP-3009 exact. All private keys are test-only.",
+  "inputs": {
+    "clientEphemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+    "sellerEncryptionPrivateKey": "0xa909a894d6dc8da31094ac24de7fb87d70c2de50fe82e97222283124988db64a",
+    "payerPrivateKey": "0x05043480f608a94724ad738fea70a32e58d726d9700c061d355f39c7bddec84e",
+    "payToPrivateKey": "0x342f0a35e88ecf8b7be1379ea57294131c8a0e6fc4b4b5215d841bfd74d90de5",
+    "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2",
+    "iv": "0x93c441cc53842071e3e675de",
+    "network": "eip155:84532",
+    "tokenDomain": {
+      "name": "USD Coin",
+      "version": "2",
+      "chainId": 84532,
+      "verifyingContract": "0x000000000000000000000000000000000000dEaD"
+    },
+    "authorization": {
+      "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+      "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+      "value": "10000",
+      "validAfter": "0",
+      "validBefore": "1893456000"
+    },
+    "attestation": {
+      "notBefore": 1793836800,
+      "notAfter": 1825372800
+    },
+    "request": {
+      "method": "POST",
+      "url": "https://api.seller.example/v1/report?id=42",
+      "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+    },
+    "response": {
+      "status": 200,
+      "contentType": "application/json",
+      "body": "{\"city\":\"Seoul\",\"tempC\":12.5,\"condition\":\"clear\"}"
+    }
+  },
+  "intermediate": {
+    "clientEphemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+    "sellerEncryptionPublicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+    "payerAddress": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+    "payToAddress": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+    "requestBodySha256": "0x5b67c7dc43a6b6d3f3d8ebc34df60bee8006fde5594c16e7404befc50bed2b0a",
+    "requestHash": "0xaddb061176dc73513853d4d1fda865b14129e70f4c96929c01f45758d32ca8d7",
+    "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c",
+    "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+    "attestationDigest": "0xce73a9f7de77babd454fa6752b08412d3834b8debaaa33f79916f1c28aa69213",
+    "attestationSignature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b",
+    "authorizationDigest": "0x0a6336b95bb63e73d65e24a5fd6af3ad335d4f74317a4fafb4f6e7aed3dc5375",
+    "authorizationSignature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+    "sharedSecretZ": "0x210c4ffe603fe94e316f28715c2cadc0f6f21f6a56e482c4db14485b66a2db86",
+    "hkdfInfo": "0x783430322d726573706f6e73652d656e6372797074696f6e2f76312f726573706f6e736503abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cecc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a0000000c6569703135353a3834353332addb061176dc73513853d4d1fda865b14129e70f4c96929c01f45758d32ca8d7",
+    "aesKey": "0xa4b0ea90fcda0dc8a142bd3c0805d24b6f31502a86b6f57c0e462b606d9b7079",
+    "aad": "0x783430322d726573706f6e73652d656e6372797074696f6e2f76312f61616401c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a00c8000000106170706c69636174696f6e2f6a736f6e"
+  },
+  "output": {
+    "envelope": {
+      "version": 1,
+      "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+      "status": 200,
+      "contentType": "application/json",
+      "iv": "k8RBzFOEIHHj5nXe",
+      "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+    }
+  },
+  "checks": {
+    "ecdhSymmetric": true,
+    "ecdhMatchesNodeCrypto": true,
+    "attestationRecovers": true,
+    "authorizationRecovers": true,
+    "decrypts": true,
+    "swappedEphemeralKeyChangesNonce": true
+  }
+}

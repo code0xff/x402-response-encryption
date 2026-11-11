@@ -1,0 +1,3513 @@
+{
+  "description": "Tampering cases derived from vector-1.",
+  "network": "eip155:84532",
+  "tokenDomain": {
+    "name": "USD Coin",
+    "version": "2",
+    "chainId": 84532,
+    "verifyingContract": "0x000000000000000000000000000000000000dEaD"
+  },
+  "seller": {
+    "encryptionPrivateKey": "0xa909a894d6dc8da31094ac24de7fb87d70c2de50fe82e97222283124988db64a",
+    "keyIds": [
+      "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a"
+    ]
+  },
+  "cases": [
+    {
+      "id": "valid",
+      "description": "No tampering.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": null
+    },
+    {
+      "id": "valid-did-web",
+      "description": "No tampering, client also checks the did:web DID document.",
+      "profile": "did-web",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "didDocument": {
+          "@context": [
+            "https://www.w3.org/ns/did/v1",
+            "https://w3id.org/security/suites/jws-2020/v1"
+          ],
+          "id": "did:web:api.seller.example",
+          "verificationMethod": [
+            {
+              "id": "did:web:api.seller.example#payto-eip155-84532",
+              "type": "EcdsaSecp256k1RecoveryMethod2020",
+              "controller": "did:web:api.seller.example",
+              "blockchainAccountId": "eip155:84532:0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+            },
+            {
+              "id": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "type": "JsonWebKey2020",
+              "controller": "did:web:api.seller.example",
+              "publicKeyJwk": {
+                "kty": "EC",
+                "crv": "secp256k1",
+                "x": "erKJPvFnEBQcEwgHgdAnyAeLOnA3H7DCzzPc4LpsfOw",
+                "y": "HkbgZYvbU5RrhPpF2TgnnUZMQfBWcz5q2nAKWDBck0s"
+              },
+              "x402ResponseEncryption": {
+                "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              }
+            }
+          ],
+          "keyAgreement": [
+            "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a"
+          ]
+        },
+        "now": 1800000000
+      },
+      "expect": null
+    },
+    {
+      "id": "402-full-swap-core",
+      "description": "Core profile: intermediary replaces payTo, key and attestation with its own valid set. The client cannot tell; the payment goes to the substituted payTo on-chain.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x7AFAe22f41203EDF98213e0F14cC181F01D27b6d"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0x02064225efe43923909e3493cbb9d85f096c1a53adbfcfd738b2f0fd2abc6aaa",
+          "publicKey": "0x0265277b4bb84d600be165a79a7bb664d7cf349f0f082f4cf064f1910a2ec1a8cb",
+          "attestation": {
+            "payTo": "0x7AFAe22f41203EDF98213e0F14cC181F01D27b6d",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0x409282fe125fc00e7ebc15144c85c05c13ee812b6e648b714c057295e8598028263545e97f4f65384f1d4a53d6ea25012ecf0da3c17c5bab5fc726db2b4eae921c"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": null
+      }
+    },
+    {
+      "id": "402-pubkey-swapped",
+      "description": "Intermediary replaces the 402 public key only.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x0265277b4bb84d600be165a79a7bb664d7cf349f0f082f4cf064f1910a2ec1a8cb",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": "response_encryption_key_id_mismatch"
+      }
+    },
+    {
+      "id": "402-key-and-keyid-swapped",
+      "description": "Intermediary replaces public key and keyId consistently, keeps the attestation signature.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0x02064225efe43923909e3493cbb9d85f096c1a53adbfcfd738b2f0fd2abc6aaa",
+          "publicKey": "0x0265277b4bb84d600be165a79a7bb664d7cf349f0f082f4cf064f1910a2ec1a8cb",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": "response_encryption_attestation_invalid"
+      }
+    },
+    {
+      "id": "402-full-swap",
+      "description": "Intermediary replaces payTo, key and attestation with its own valid set.",
+      "profile": "did-web",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x7AFAe22f41203EDF98213e0F14cC181F01D27b6d"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0x02064225efe43923909e3493cbb9d85f096c1a53adbfcfd738b2f0fd2abc6aaa",
+          "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x0265277b4bb84d600be165a79a7bb664d7cf349f0f082f4cf064f1910a2ec1a8cb",
+          "attestation": {
+            "payTo": "0x7AFAe22f41203EDF98213e0F14cC181F01D27b6d",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0x409282fe125fc00e7ebc15144c85c05c13ee812b6e648b714c057295e8598028263545e97f4f65384f1d4a53d6ea25012ecf0da3c17c5bab5fc726db2b4eae921c"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "didDocument": {
+          "@context": [
+            "https://www.w3.org/ns/did/v1",
+            "https://w3id.org/security/suites/jws-2020/v1"
+          ],
+          "id": "did:web:api.seller.example",
+          "verificationMethod": [
+            {
+              "id": "did:web:api.seller.example#payto-eip155-84532",
+              "type": "EcdsaSecp256k1RecoveryMethod2020",
+              "controller": "did:web:api.seller.example",
+              "blockchainAccountId": "eip155:84532:0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+            },
+            {
+              "id": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "type": "JsonWebKey2020",
+              "controller": "did:web:api.seller.example",
+              "publicKeyJwk": {
+                "kty": "EC",
+                "crv": "secp256k1",
+                "x": "erKJPvFnEBQcEwgHgdAnyAeLOnA3H7DCzzPc4LpsfOw",
+                "y": "HkbgZYvbU5RrhPpF2TgnnUZMQfBWcz5q2nAKWDBck0s"
+              },
+              "x402ResponseEncryption": {
+                "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              }
+            }
+          ],
+          "keyAgreement": [
+            "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a"
+          ]
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": "response_encryption_did_key_not_found"
+      }
+    },
+    {
+      "id": "did-jwk-swapped",
+      "description": "DID document lists a different JWK under the kid named in the 402.",
+      "profile": "did-web",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "didDocument": {
+          "@context": [
+            "https://www.w3.org/ns/did/v1",
+            "https://w3id.org/security/suites/jws-2020/v1"
+          ],
+          "id": "did:web:api.seller.example",
+          "verificationMethod": [
+            {
+              "id": "did:web:api.seller.example#payto-eip155-84532",
+              "type": "EcdsaSecp256k1RecoveryMethod2020",
+              "controller": "did:web:api.seller.example",
+              "blockchainAccountId": "eip155:84532:0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+            },
+            {
+              "id": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "type": "JsonWebKey2020",
+              "controller": "did:web:api.seller.example",
+              "publicKeyJwk": {
+                "kty": "EC",
+                "crv": "secp256k1",
+                "x": "ZSd7S7hNYAvhZaeae7Zk1880nw8IL0zwZPGRCi7BqMs",
+                "y": "KWXx4fNdhVmMzTi1yq4n0g4rLT10Tvec1T3c85RqsDY"
+              },
+              "x402ResponseEncryption": {
+                "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              }
+            }
+          ],
+          "keyAgreement": [
+            "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a"
+          ]
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": "response_encryption_did_key_mismatch"
+      }
+    },
+    {
+      "id": "402-full-swap-own-did",
+      "description": "Full swap, and kid also pointed at an attacker-controlled DID.",
+      "profile": "did-web",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x7AFAe22f41203EDF98213e0F14cC181F01D27b6d"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0x02064225efe43923909e3493cbb9d85f096c1a53adbfcfd738b2f0fd2abc6aaa",
+          "kid": "did:web:attacker.example#x402-re-02064225efe43923909e3493cbb9d85f096c1a53adbfcfd738b2f0fd2abc6aaa",
+          "publicKey": "0x0265277b4bb84d600be165a79a7bb664d7cf349f0f082f4cf064f1910a2ec1a8cb",
+          "attestation": {
+            "payTo": "0x7AFAe22f41203EDF98213e0F14cC181F01D27b6d",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0x409282fe125fc00e7ebc15144c85c05c13ee812b6e648b714c057295e8598028263545e97f4f65384f1d4a53d6ea25012ecf0da3c17c5bab5fc726db2b4eae921c"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "didDocument": {
+          "@context": [
+            "https://www.w3.org/ns/did/v1",
+            "https://w3id.org/security/suites/jws-2020/v1"
+          ],
+          "id": "did:web:api.seller.example",
+          "verificationMethod": [
+            {
+              "id": "did:web:api.seller.example#payto-eip155-84532",
+              "type": "EcdsaSecp256k1RecoveryMethod2020",
+              "controller": "did:web:api.seller.example",
+              "blockchainAccountId": "eip155:84532:0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+            },
+            {
+              "id": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "type": "JsonWebKey2020",
+              "controller": "did:web:api.seller.example",
+              "publicKeyJwk": {
+                "kty": "EC",
+                "crv": "secp256k1",
+                "x": "erKJPvFnEBQcEwgHgdAnyAeLOnA3H7DCzzPc4LpsfOw",
+                "y": "HkbgZYvbU5RrhPpF2TgnnUZMQfBWcz5q2nAKWDBck0s"
+              },
+              "x402ResponseEncryption": {
+                "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              }
+            }
+          ],
+          "keyAgreement": [
+            "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a"
+          ]
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": "response_encryption_did_origin_mismatch"
+      }
+    },
+    {
+      "id": "402-payto-redirected",
+      "description": "Intermediary keeps the real key but substitutes its own payTo with a valid attestation.",
+      "profile": "did-web",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x7AFAe22f41203EDF98213e0F14cC181F01D27b6d"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x7AFAe22f41203EDF98213e0F14cC181F01D27b6d",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0x5e14b814a92eac8e3e015bfb99b8452afd3e35d17cdd60502b5074afadb0e5cf186c73fa3b183a237cf38d9d6187e1470995fb28bdd24f4340407ccbe050b2121c"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "didDocument": {
+          "@context": [
+            "https://www.w3.org/ns/did/v1",
+            "https://w3id.org/security/suites/jws-2020/v1"
+          ],
+          "id": "did:web:api.seller.example",
+          "verificationMethod": [
+            {
+              "id": "did:web:api.seller.example#payto-eip155-84532",
+              "type": "EcdsaSecp256k1RecoveryMethod2020",
+              "controller": "did:web:api.seller.example",
+              "blockchainAccountId": "eip155:84532:0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+            },
+            {
+              "id": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "type": "JsonWebKey2020",
+              "controller": "did:web:api.seller.example",
+              "publicKeyJwk": {
+                "kty": "EC",
+                "crv": "secp256k1",
+                "x": "erKJPvFnEBQcEwgHgdAnyAeLOnA3H7DCzzPc4LpsfOw",
+                "y": "HkbgZYvbU5RrhPpF2TgnnUZMQfBWcz5q2nAKWDBck0s"
+              },
+              "x402ResponseEncryption": {
+                "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              }
+            }
+          ],
+          "keyAgreement": [
+            "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a"
+          ]
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": "response_encryption_did_pay_to_mismatch"
+      }
+    },
+    {
+      "id": "attestation-pay-to-differs",
+      "description": "Intermediary attaches an attestation from another address; the payment requirements still name the seller payTo.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x7AFAe22f41203EDF98213e0F14cC181F01D27b6d",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0x5e14b814a92eac8e3e015bfb99b8452afd3e35d17cdd60502b5074afadb0e5cf186c73fa3b183a237cf38d9d6187e1470995fb28bdd24f4340407ccbe050b2121c"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": "response_encryption_pay_to_mismatch"
+      }
+    },
+    {
+      "id": "did-key-revoked",
+      "description": "Key removed from keyAgreement in the DID document.",
+      "profile": "did-web",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "kid": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "didDocument": {
+          "@context": [
+            "https://www.w3.org/ns/did/v1",
+            "https://w3id.org/security/suites/jws-2020/v1"
+          ],
+          "id": "did:web:api.seller.example",
+          "verificationMethod": [
+            {
+              "id": "did:web:api.seller.example#payto-eip155-84532",
+              "type": "EcdsaSecp256k1RecoveryMethod2020",
+              "controller": "did:web:api.seller.example",
+              "blockchainAccountId": "eip155:84532:0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+            },
+            {
+              "id": "did:web:api.seller.example#x402-re-c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "type": "JsonWebKey2020",
+              "controller": "did:web:api.seller.example",
+              "publicKeyJwk": {
+                "kty": "EC",
+                "crv": "secp256k1",
+                "x": "erKJPvFnEBQcEwgHgdAnyAeLOnA3H7DCzzPc4LpsfOw",
+                "y": "HkbgZYvbU5RrhPpF2TgnnUZMQfBWcz5q2nAKWDBck0s"
+              },
+              "x402ResponseEncryption": {
+                "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              }
+            }
+          ],
+          "keyAgreement": []
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": "response_encryption_did_key_not_found"
+      }
+    },
+    {
+      "id": "attestation-expired",
+      "description": "Client clock is past notAfter.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1830000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": "response_encryption_attestation_expired"
+      }
+    },
+    {
+      "id": "extension-missing",
+      "description": "Intermediary strips the response-encryption extension.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": null
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_extension_missing"
+      }
+    },
+    {
+      "id": "unsupported-version",
+      "description": "Payload declares an extension version the seller does not implement.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 2,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_unsupported_version"
+      }
+    },
+    {
+      "id": "unsupported-suite",
+      "description": "Intermediary advertises a suite the client does not implement.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "x25519-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-402",
+        "reason": "response_encryption_unsupported_suite"
+      }
+    },
+    {
+      "id": "rotated-key-in-grace",
+      "description": "Seller has rotated to a new key but still accepts the old one during the grace period; the client paid against the old 402.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "seller": {
+        "encryptionPrivateKey": "0xa909a894d6dc8da31094ac24de7fb87d70c2de50fe82e97222283124988db64a",
+        "keyIds": [
+          "0x2fc35e45f8fd66be83c7be1ff14735d073dd921b1908a0fffbc9bc8fe1be938f",
+          "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a"
+        ]
+      },
+      "expect": null
+    },
+    {
+      "id": "rotated-key-after-grace",
+      "description": "Seller has rotated and dropped the old key; the client paid against a stale 402.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "seller": {
+        "encryptionPrivateKey": "0xa909a894d6dc8da31094ac24de7fb87d70c2de50fe82e97222283124988db64a",
+        "keyIds": [
+          "0x2fc35e45f8fd66be83c7be1ff14735d073dd921b1908a0fffbc9bc8fe1be938f"
+        ]
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_unknown_key_id"
+      }
+    },
+    {
+      "id": "retry-after-settlement",
+      "description": "Client resends the identical paid request after losing the response; the seller returns its stored envelope without settling again.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": null
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "seller": {
+        "encryptionPrivateKey": "0xa909a894d6dc8da31094ac24de7fb87d70c2de50fe82e97222283124988db64a",
+        "keyIds": [
+          "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a"
+        ],
+        "stored": {
+          "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c": {
+            "version": 1,
+            "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+            "status": 200,
+            "contentType": "application/json",
+            "iv": "k8RBzFOEIHHj5nXe",
+            "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+          }
+        }
+      },
+      "expect": null
+    },
+    {
+      "id": "retry-after-key-rotation",
+      "description": "As retry-after-settlement, but the seller has since dropped the keyId; the stored envelope is still returned.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": null
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "seller": {
+        "encryptionPrivateKey": "0xa909a894d6dc8da31094ac24de7fb87d70c2de50fe82e97222283124988db64a",
+        "keyIds": [
+          "0x2fc35e45f8fd66be83c7be1ff14735d073dd921b1908a0fffbc9bc8fe1be938f"
+        ],
+        "stored": {
+          "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c": {
+            "version": 1,
+            "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+            "status": 200,
+            "contentType": "application/json",
+            "iv": "k8RBzFOEIHHj5nXe",
+            "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+          }
+        }
+      },
+      "expect": null
+    },
+    {
+      "id": "retry-request-changed",
+      "description": "Settled payload replayed with a different request body; the stored envelope must not be released.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"id\":43}"
+        },
+        "envelope": null
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "seller": {
+        "encryptionPrivateKey": "0xa909a894d6dc8da31094ac24de7fb87d70c2de50fe82e97222283124988db64a",
+        "keyIds": [
+          "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a"
+        ],
+        "stored": {
+          "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c": {
+            "version": 1,
+            "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+            "status": 200,
+            "contentType": "application/json",
+            "iv": "k8RBzFOEIHHj5nXe",
+            "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+          }
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "unknown-key-id",
+      "description": "Payload names a keyId the seller does not hold.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0x02064225efe43923909e3493cbb9d85f096c1a53adbfcfd738b2f0fd2abc6aaa",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_unknown_key_id"
+      }
+    },
+    {
+      "id": "key-id-swapped-to-accepted-key",
+      "description": "Intermediary replaces keyId with another key the seller still accepts, e.g. an old key it has obtained.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0x2fc35e45f8fd66be83c7be1ff14735d073dd921b1908a0fffbc9bc8fe1be938f",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "seller": {
+        "encryptionPrivateKey": "0xa909a894d6dc8da31094ac24de7fb87d70c2de50fe82e97222283124988db64a",
+        "keyIds": [
+          "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "0x2fc35e45f8fd66be83c7be1ff14735d073dd921b1908a0fffbc9bc8fe1be938f"
+        ]
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "ephemeral-key-swapped",
+      "description": "Intermediary replaces the ephemeral public key in the payload.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x0230210833df4db7c5ac5566c6d77a09fca95fb6fc53529f7a5741257d92c150ec",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "ephemeral-key-and-nonce-swapped",
+      "description": "Intermediary replaces the ephemeral key and rewrites authorization.nonce to match.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0x0385f7eb1fc0acfc74ce36dc9fb5b633544051d326e54ad3236b76970cea7299"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x0230210833df4db7c5ac5566c6d77a09fca95fb6fc53529f7a5741257d92c150ec",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "invalid_exact_evm_payload_signature"
+      }
+    },
+    {
+      "id": "nonce-salt-changed",
+      "description": "Intermediary changes nonceSalt.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xd53b30fb4f433e30ee4b5ffcef2a87c1c4e160a3d67d7cc337a79e8234959ca2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "request-body-changed",
+      "description": "Intermediary changes the request body.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Busan\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "request-path-changed",
+      "description": "Intermediary changes the request path.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/admin?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "request-query-changed",
+      "description": "Intermediary changes a query parameter.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=43",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "equivalent-url-form",
+      "description": "Seller sees a different but equivalent spelling of the URL.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "HTTPS://API.Seller.example:443/v1/./report?id=42#x",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": null
+    },
+    {
+      "id": "resource-url-changed-in-402",
+      "description": "Intermediary alters resource.url in the 402; client signs over it, seller receives the original request.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=43"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0x07bbc7503a1f4eecba286696f95f9b9cbda6a47e62c722bc9723dadaf49dcd7c"
+          },
+          "signature": "0x4986166d7607845ebb7d8300aa31f7dc9162105de52ae9d39beeeff6591a91e42784cdd17f7160f8e28ba68d4e4c5db2533a5f3d08f31b359a8709775546cd531b",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=43",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0x07bbc7503a1f4eecba286696f95f9b9cbda6a47e62c722bc9723dadaf49dcd7c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "request-method-changed",
+      "description": "Intermediary changes the request method.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "GET",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "ciphertext-flipped",
+      "description": "One ciphertext bit flipped.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GwqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-response",
+        "reason": "response_encryption_decrypt_failed"
+      }
+    },
+    {
+      "id": "gcm-tag-truncated",
+      "description": "Last byte of the GCM tag removed.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-response",
+        "reason": "response_encryption_decrypt_failed"
+      }
+    },
+    {
+      "id": "iv-changed",
+      "description": "IV changed.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "ksRBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-response",
+        "reason": "response_encryption_decrypt_failed"
+      }
+    },
+    {
+      "id": "status-changed",
+      "description": "Envelope status changed 200 -> 201.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 201,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-response",
+        "reason": "response_encryption_decrypt_failed"
+      }
+    },
+    {
+      "id": "content-type-changed",
+      "description": "Envelope contentType changed.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "text/plain",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-response",
+        "reason": "response_encryption_decrypt_failed"
+      }
+    },
+    {
+      "id": "wrong-ephemeral-private-key",
+      "description": "Client decrypts with a different ephemeral private key.",
+      "profile": "core",
+      "wire": {
+        "paymentRequirements": {
+          "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+        },
+        "paymentRequired": {
+          "resource": {
+            "url": "https://api.seller.example/v1/report?id=42"
+          },
+          "version": 1,
+          "required": true,
+          "suite": "secp256k1-hkdf-sha256-aes256gcm",
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+          "attestation": {
+            "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "notBefore": 1793836800,
+            "notAfter": 1825372800,
+            "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+          }
+        },
+        "paymentPayload": {
+          "authorization": {
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+            "value": "10000",
+            "validAfter": "0",
+            "validBefore": "1893456000",
+            "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+          },
+          "signature": "0xb56a910d2aa511b8c8b9ad899b3935f246bca9b19ba8f095c07df02180fb3e2b6d4eaa026a1824e38b7f8c0f95f3805e5b026b3ba9c36f767d5a9096fad3b2a41c",
+          "extension": {
+            "info": {
+              "version": 1,
+              "required": true,
+              "suite": "secp256k1-hkdf-sha256-aes256gcm",
+              "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+              "publicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+              "attestation": {
+                "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+                "notBefore": 1793836800,
+                "notAfter": 1825372800,
+                "signature": "0xe8dfb9491bfa04ebba5a8669762968d7cdd3f5041e6ca6d115110a82d93f64fe59453fc094449a9a927b100fb1779986e48b25dae0e2fa73afa9aaabe14747cc1b"
+              },
+              "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+              "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+            }
+          }
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "envelope": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "status": 200,
+          "contentType": "application/json",
+          "iv": "k8RBzFOEIHHj5nXe",
+          "ciphertext": "GgqPptbH_BVYqi9ZGo72iKJTyyJ3B3dYgGyOLVh7oNO5W-m0vLfWZRhL3kcaOrmeytQ1TVMUlCe59Inx6KN8kFA"
+        }
+      },
+      "client": {
+        "ephemeralPrivateKey": "0x4b15f289ccce2240a6e6b4fab4e8328d603896e989a5d2d9bbd017975675bde5",
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        },
+        "authorization": {
+          "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+          "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+          "value": "10000",
+          "validAfter": "0",
+          "validBefore": "1893456000",
+          "nonce": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c"
+        },
+        "now": 1800000000
+      },
+      "expect": {
+        "stage": "client-response",
+        "reason": "response_encryption_decrypt_failed"
+      }
+    }
+  ]
+}
