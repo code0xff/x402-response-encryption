@@ -1,0 +1,26 @@
+{
+  "name": "@x402-response-encryption/fetch",
+  "version": "0.1.0",
+  "description": "fetch wrapper that pays x402 resources and decrypts their encrypted responses.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@x402-response-encryption/core": "0.1.0",
+    "@x402/core": "2.29.0",
+    "viem": "2.57.8"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "typescript": "5.6.3",
+    "vitest": "2.1.8"
+  }
+}
