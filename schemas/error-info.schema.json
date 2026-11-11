@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "response-encryption error info (v1)",
+  "description": "Machine-readable rejection reason a resource server returns in extensions[\"response-encryption\"].info.errorReason.",
+  "type": "object",
+  "properties": {
+    "errorReason": {
+      "enum": [
+        "response_encryption_extension_missing",
+        "response_encryption_unsupported_version",
+        "response_encryption_unknown_key_id",
+        "response_encryption_invalid_ephemeral_key",
+        "response_encryption_invalid_url",
+        "response_encryption_nonce_mismatch",
+        "response_encryption_encryption_failed"
+      ]
+    },
+    "errorMessage": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "errorReason"
+  ]
+}

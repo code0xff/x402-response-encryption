@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "response-encryption success envelope (v1)",
+  "description": "Body of a paid success response served as application/x402-encrypted+json.",
+  "type": "object",
+  "properties": {
+    "version": { "const": 1 },
+    "keyId": { "type": "string", "pattern": "^0x[0-9a-fA-F]{64}$" },
+    "status": { "type": "integer", "minimum": 200, "maximum": 299 },
+    "contentType": { "type": "string", "minLength": 1 },
+    "iv": { "type": "string", "pattern": "^[A-Za-z0-9_-]{16}$" },
+    "ciphertext": { "type": "string", "pattern": "^[A-Za-z0-9_-]{22,}$" }
+  },
+  "required": ["version", "keyId", "status", "contentType", "iv", "ciphertext"],
+  "additionalProperties": false
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "response-encryption PaymentRequired info (v1)",
+  "description": "The 402 info. A rejection (proposal 7.4) adds errorReason and an optional errorMessage; clients drop both before echoing (7.2).",
+  "type": "object",
+  "properties": {
+    "version": { "const": 1 },
+    "required": { "type": "boolean" },
+    "suite": { "const": "secp256k1-hkdf-sha256-aes256gcm" },
+    "keyId": { "$ref": "#/$defs/bytes32" },
+    "kid": { "description": "Optional. did:web profile only (proposal 4.5).", "type": "string", "pattern": "^did:web:[^#]+#x402-re-[0-9a-f]{64}$" },
+    "publicKey": { "$ref": "#/$defs/compressedPoint" },
+    "attestation": {
+      "type": "object",
+      "properties": {
+        "payTo": { "$ref": "#/$defs/address" },
+        "notBefore": { "$ref": "#/$defs/uint64" },
+        "notAfter": { "$ref": "#/$defs/uint64" },
+        "signature": { "type": "string", "pattern": "^0x([0-9a-fA-F]{2})+$" }
+      },
+      "required": ["payTo", "notBefore", "notAfter", "signature"],
+      "additionalProperties": false
+    },
+    "errorReason": { "description": "Same codes as error-info.schema.json.", "enum": ["response_encryption_extension_missing", "response_encryption_unsupported_version", "response_encryption_unknown_key_id", "response_encryption_invalid_ephemeral_key", "response_encryption_invalid_url", "response_encryption_nonce_mismatch", "response_encryption_encryption_failed"] },
+    "errorMessage": { "type": "string" }
+  },
+  "required": ["version", "required", "suite", "keyId", "publicKey", "attestation"],
+  "additionalProperties": false,
+  "$defs": {
+    "bytes32": { "type": "string", "pattern": "^0x[0-9a-fA-F]{64}$" },
+    "compressedPoint": { "type": "string", "pattern": "^0x0[23][0-9a-fA-F]{64}$" },
+    "address": { "type": "string", "pattern": "^0x[0-9a-fA-F]{40}$" },
+    "uint64": { "type": "integer", "minimum": 0, "maximum": 18446744073709551615 }
+  }
+}
