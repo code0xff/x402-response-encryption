@@ -1,0 +1,26 @@
+{
+  "name": "@x402-response-encryption/example-base-sepolia",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "demo": "tsx demo.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@x402-response-encryption/core": "0.1.0",
+    "@x402-response-encryption/express": "0.1.0",
+    "@x402-response-encryption/fetch": "0.1.0",
+    "@x402/core": "2.29.0",
+    "@x402/evm": "2.29.0",
+    "@x402/express": "2.29.0",
+    "express": "4.22.3",
+    "viem": "2.57.8"
+  },
+  "devDependencies": {
+    "@types/express": "4.17.25",
+    "@types/node": "22.10.2",
+    "tsx": "4.19.2",
+    "typescript": "5.6.3"
+  }
+}
