@@ -1,0 +1,17 @@
+{
+  "name": "x402-response-encryption",
+  "private": true,
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/core",
+    "packages/fetch",
+    "packages/express",
+    "examples/base-sepolia"
+  ],
+  "scripts": {
+    "build": "npm run build -w packages/core -w packages/fetch -w packages/express",
+    "test": "npm run build -w packages/core -w packages/fetch && npm test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces",
+    "demo": "npm run build && npm run demo -w examples/base-sepolia"
+  }
+}
