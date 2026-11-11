@@ -65,7 +65,7 @@ node url-cases.mjs    # url-cases.json
 
 ## Status
 
-The design is ready for review. The TypeScript packages settle real payments on Base Sepolia through the x402 SDK, with no plaintext reaching the intermediary. Open items are listed in section 11 of the proposal.
+The design is ready for review and is proposed in [x402-foundation/x402#4223](https://github.com/x402-foundation/x402/issues/4223); discussion happens there. The TypeScript packages settle real payments on Base Sepolia through the x402 SDK, with no plaintext reaching the intermediary. Open items are listed in section 11 of the proposal.
 
 ## License
 
