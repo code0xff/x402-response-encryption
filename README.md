@@ -2,7 +2,7 @@
 
 A proposed [x402](https://github.com/x402-foundation/x402) extension that lets only the paying client read a paid response.
 
-An x402 response usually crosses CDNs, reverse proxies, API gateways or marketplaces that terminate TLS and can log or cache it in plaintext. With this extension the seller encrypts the response body to a per-request ephemeral key that the client commits into the EIP-3009 payment `nonce`. The seller's encryption key carries an attestation signed by `payTo`. An intermediary cannot swap either key without breaking the payment signature or redirecting the payment on-chain.
+An x402 response usually crosses CDNs, reverse proxies, API gateways or marketplaces that terminate TLS and can log or cache it in plaintext. With this extension the seller encrypts the response body to a per-request ephemeral key that the client commits into a field its payment signature covers: the `nonce` for EIP-3009 and Permit2, a memo for Solana (vectors only). The seller's encryption key carries an attestation signed by `payTo`. An intermediary cannot swap either key without breaking the payment signature or redirecting the payment on-chain.
 
 Status: design draft. Nothing here has been adopted into the x402 specification.
 
@@ -14,7 +14,7 @@ Status: design draft. Nothing here has been adopted into the x402 specification.
 | [`schemas/`](schemas/) | JSON Schemas (draft 2020-12) for the extension messages |
 | [`packages/core/`](packages/core/) | TypeScript implementation of the primitives: URL canonicalization, nonce binding, key attestation, envelope encryption. Tested against the shared vectors |
 | [`packages/express/`](packages/express/) | Express middleware for both deployments: a seller running `@x402/express` itself, or an origin behind a payment gateway that runs x402. Checks the binding before settlement, encrypts, stores envelopes for retries |
-| [`packages/fetch/`](packages/fetch/) | Client `fetch` wrapper: verifies the seller key, signs an EIP-3009 authorization with the binding nonce, decrypts, refuses plaintext |
+| [`packages/fetch/`](packages/fetch/) | Client `fetch` wrapper: verifies the seller key, signs an EIP-3009 or Permit2 payment with the commitment as nonce, decrypts, refuses plaintext |
 | [`test-vectors/`](test-vectors/) | Test vectors generated in TypeScript and an independent Python verifier |
 
 ## Verifying the test vectors
@@ -48,7 +48,8 @@ The packages are a reference implementation for evaluating the proposal, not pro
 `examples/base-sepolia` makes one paid, encrypted request through a logging reverse proxy and settles it on Base Sepolia with an in-process facilitator from the x402 SDK. It needs a `.env` at the repository root with `CLIENT_PRIVATE_KEY` (holding test USDC), `PAYTO_PRIVATE_KEY` (holding a little Base Sepolia ETH for settlement gas) and `SELLER_ENCRYPTION_PRIVATE_KEY`. Set `FACILITATOR_URL` to use a hosted facilitator instead.
 
 ```sh
-npm run demo
+npm run demo            # EIP-3009
+npm run demo:permit2    # Permit2; the client approves the Permit2 contract once and needs a little ETH for that
 ```
 
 It prints the decrypted body, the settlement transaction, everything the proxy recorded, and whether any plaintext appeared there.

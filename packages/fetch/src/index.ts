@@ -1,20 +1,27 @@
 // Client side of x402 response encryption: a fetch wrapper that pays with an
-// EIP-3009 authorization whose nonce commits a fresh ephemeral key (proposal 3.1),
+// `exact` EVM payment whose signed commitment binds a fresh ephemeral key (proposal 3.1),
 // then decrypts the seller's envelope. Plaintext success responses are refused.
+// Profiles (proposal 3.5): EIP-3009 (c in authorization.nonce) and Permit2 (c in the
+// Permit2 nonce). Permit2 needs the payer's one-time ERC-20 approval of the Permit2 contract.
 import {
   ENVELOPE_CONTENT_TYPE,
   EXTENSION_KEY,
   ResponseEncryptionError,
   authorizationDigest,
+  X402_EXACT_PERMIT2_PROXY,
   canonicalUrl,
+  commitmentToPermit2Nonce,
   createBinding,
+  fromHex,
   openResponse,
   payloadInfoFor,
+  permit2TypedData,
   transferAuthorizationTypedData,
   verifySellerKey,
   type ClientBinding,
   type ContractSignatureVerifier,
   type Envelope,
+  type Permit2Authorization,
   type PaymentRequiredInfo,
   type TokenDomain,
   type TransferAuthorization,
@@ -22,12 +29,12 @@ import {
 } from '@x402-response-encryption/core';
 import { decodePaymentRequiredHeader, decodePaymentResponseHeader, encodePaymentSignatureHeader } from '@x402/core/http';
 import type { PaymentPayload, PaymentRequired, PaymentRequirements } from '@x402/core/types';
-import { getAddress, type Address, type Hex } from 'viem';
+import { getAddress, hashTypedData, type Address, type Hex, type TypedDataDefinition } from 'viem';
 
 /** Minimal signer: a viem LocalAccount or WalletClient account satisfies it. */
 export interface PaymentSigner {
   address: Address;
-  signTypedData(args: ReturnType<typeof transferAuthorizationTypedData>): Promise<Hex>;
+  signTypedData(args: TypedDataDefinition): Promise<Hex>;
 }
 
 export interface EncryptedFetchOptions {
@@ -78,6 +85,7 @@ async function committedBody(request: Request): Promise<Uint8Array> {
 }
 
 const isEip155Exact = (r: PaymentRequirements) => r.scheme === 'exact' && r.network.startsWith('eip155:');
+const methodOf = (r: PaymentRequirements) => (r.extra?.assetTransferMethod as string | undefined) ?? 'eip3009';
 
 function readPaymentRequired(res: Response, body: string): PaymentRequired {
   const header = res.headers.get('PAYMENT-REQUIRED');
@@ -112,9 +120,12 @@ export function wrapFetchWithEncryptedPayment(fetchImpl: typeof fetch, opts: Enc
     })();
     if (!sameUrl) throw new EncryptedFetchError('402 resource.url differs from the requested URL', 'response_encryption_resource_url_mismatch');
     const requirements = pr.accepts.find(
-      (r) => isEip155Exact(r) && (r.extra?.assetTransferMethod ?? 'eip3009') === 'eip3009' && getAddress(r.payTo) === getAddress(info.attestation.payTo),
+      (r) =>
+        isEip155Exact(r) &&
+        (methodOf(r) === 'eip3009' || methodOf(r) === 'permit2') &&
+        getAddress(r.payTo) === getAddress(info.attestation.payTo),
     );
-    if (!requirements) throw new EncryptedFetchError('no EIP-3009 exact requirement matches the attested payTo', 'response_encryption_pay_to_mismatch');
+    if (!requirements) throw new EncryptedFetchError('no exact EVM requirement matches the attested payTo', 'response_encryption_pay_to_mismatch');
 
     const chainId = Number(requirements.network.split(':')[1]);
     const key = await verifySellerKey(info, {
@@ -127,24 +138,41 @@ export function wrapFetchWithEncryptedPayment(fetchImpl: typeof fetch, opts: Enc
 
     // requestHash covers resource.url from the 402, the seller's public namespace (proposal 3.3).
     const binding = createBinding(key, { method, url: pr.resource.url, body: bodyBytes });
-    const authorization: TransferAuthorization = {
-      from: opts.signer.address,
-      to: getAddress(requirements.payTo),
-      value: requirements.amount,
-      validAfter: '0',
-      validBefore: String(now() + requirements.maxTimeoutSeconds),
-      nonce: binding.nonce,
-    };
-    const extra = requirements.extra as { name?: string; version?: string };
-    if (!extra.name || !extra.version) throw new EncryptedFetchError('requirements lack the token EIP-712 domain');
-    const domain: TokenDomain = { name: extra.name, version: extra.version, chainId, verifyingContract: getAddress(requirements.asset) };
-    const signature = await opts.signer.signTypedData(transferAuthorizationTypedData(domain, authorization));
+    let signed: { payload: Record<string, unknown>; digest: Uint8Array };
+    if (methodOf(requirements) === 'permit2') {
+      // c is the Permit2 nonce; spender and witness follow x402's exact Permit2 profile.
+      const authorization: Permit2Authorization = {
+        from: opts.signer.address,
+        permitted: { token: getAddress(requirements.asset), amount: requirements.amount },
+        spender: X402_EXACT_PERMIT2_PROXY,
+        nonce: commitmentToPermit2Nonce(binding.nonce),
+        deadline: String(now() + requirements.maxTimeoutSeconds),
+        witness: { to: getAddress(requirements.payTo), validAfter: '0' },
+      };
+      const typed = permit2TypedData(chainId, authorization);
+      const signature = await opts.signer.signTypedData(typed as unknown as TypedDataDefinition);
+      signed = { payload: { signature, permit2Authorization: authorization }, digest: fromHex(hashTypedData(typed)) };
+    } else {
+      const authorization: TransferAuthorization = {
+        from: opts.signer.address,
+        to: getAddress(requirements.payTo),
+        value: requirements.amount,
+        validAfter: '0',
+        validBefore: String(now() + requirements.maxTimeoutSeconds),
+        nonce: binding.nonce,
+      };
+      const extra = requirements.extra as { name?: string; version?: string };
+      if (!extra.name || !extra.version) throw new EncryptedFetchError('requirements lack the token EIP-712 domain');
+      const domain: TokenDomain = { name: extra.name, version: extra.version, chainId, verifyingContract: getAddress(requirements.asset) };
+      const signature = await opts.signer.signTypedData(transferAuthorizationTypedData(domain, authorization) as unknown as TypedDataDefinition);
+      signed = { payload: { authorization, signature }, digest: authorizationDigest(domain, authorization) };
+    }
 
     const payload: PaymentPayload = {
       x402Version: 2,
       resource: pr.resource,
       accepted: requirements,
-      payload: { authorization, signature },
+      payload: signed.payload,
       // x402 extensions echo the advertised info and add the client's fields.
       extensions: {
         [EXTENSION_KEY]: { info: payloadInfoFor(info, binding.payloadInfo) },
@@ -154,7 +182,7 @@ export function wrapFetchWithEncryptedPayment(fetchImpl: typeof fetch, opts: Enc
       key,
       binding,
       network: requirements.network,
-      digest: authorizationDigest(domain, authorization),
+      digest: signed.digest,
       header: encodePaymentSignatureHeader(payload),
     };
   }

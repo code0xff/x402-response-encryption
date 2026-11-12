@@ -2,6 +2,8 @@
 // Settlement runs through an in-process facilitator built from the x402 SDK
 // (gas paid by GAS_PRIVATE_KEY, default the payTo key), or through a hosted one
 // when FACILITATOR_URL is set. Keys come from ../../.env.
+// `--permit2` pays through Permit2 instead of EIP-3009 (proposal 3.5); the client then
+// approves the Permit2 contract once, paying its own gas.
 //
 //   client (fetch wrapper) -> logging proxy -> Express seller (@x402/express) -> facilitator
 import { readFileSync } from 'node:fs';
@@ -16,10 +18,10 @@ import { ExactEvmScheme as ExactEvmFacilitator } from '@x402/evm/exact/facilitat
 import { toFacilitatorEvmSigner } from '@x402/evm';
 import { decodePaymentResponseHeader } from '@x402/core/http';
 import type { SupportedResponse } from '@x402/core/types';
-import { createPublicClient, createWalletClient, erc20Abi, formatEther, formatUnits, http, publicActions, type Address, type Hex } from 'viem';
+import { createPublicClient, createWalletClient, erc20Abi, formatEther, formatUnits, http, maxUint256, publicActions, type Address, type Hex } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import { attestationTypedData, fromHex, sellerKeyFromPrivate } from '@x402-response-encryption/core';
+import { PERMIT2_ADDRESS, attestationTypedData, fromHex, sellerKeyFromPrivate } from '@x402-response-encryption/core';
 import { createResponseEncryption } from '@x402-response-encryption/express';
 import { wrapFetchWithEncryptedPayment } from '@x402-response-encryption/fetch';
 
@@ -37,6 +39,7 @@ const secret = (name: string): Hex => {
 const NETWORK = 'eip155:84532';
 const USDC: Address = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
 const FACILITATOR_URL = process.env.FACILITATOR_URL;
+const METHOD = process.argv.includes('--permit2') ? 'permit2' : 'eip3009';
 const SECRET = { report: 'Q3 revenue by region', apac: 412000, emea: 388000, amer: 951000 };
 
 const client = privateKeyToAccount(secret('CLIENT_PRIVATE_KEY'));
@@ -81,7 +84,13 @@ app.use(
   paymentMiddleware(
     {
       'POST /v1/report': {
-        accepts: { scheme: 'exact', price: '$0.01', network: NETWORK, payTo: payTo.address },
+        accepts: {
+          scheme: 'exact',
+          price: '$0.01',
+          network: NETWORK,
+          payTo: payTo.address,
+          ...(METHOD === 'permit2' && { extra: { assetTransferMethod: 'permit2' } }),
+        },
         description: 'Quarterly regional revenue',
         extensions: enc.declaration,
       },
@@ -128,7 +137,19 @@ if (local && (await chain.getBalance({ address: local.gas.address })) === 0n) {
   process.exit(1);
 }
 console.log(`client ${client.address}  USDC ${await balance(client.address)}`);
-console.log(`payTo  ${payTo.address}  USDC ${await balance(payTo.address)}\n`);
+console.log(`payTo  ${payTo.address}  USDC ${await balance(payTo.address)}`);
+console.log(`asset transfer method: ${METHOD}\n`);
+
+if (METHOD === 'permit2') {
+  const allowance = await chain.readContract({ address: USDC, abi: erc20Abi, functionName: 'allowance', args: [client.address, PERMIT2_ADDRESS] });
+  if (allowance < 10_000n) {
+    // One-time approval of the canonical Permit2 contract (x402 scheme_exact_evm.md, Permit2 prerequisites).
+    const wallet = createWalletClient({ account: client, chain: baseSepolia, transport: http() });
+    const hash = await wallet.writeContract({ address: USDC, abi: erc20Abi, functionName: 'approve', args: [PERMIT2_ADDRESS, maxUint256] });
+    await chain.waitForTransactionReceipt({ hash });
+    console.log(`client approved Permit2: ${hash}\n`);
+  }
+}
 
 try {
   const paidFetch = wrapFetchWithEncryptedPayment(fetch, { signer: client });

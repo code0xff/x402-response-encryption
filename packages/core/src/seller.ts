@@ -27,13 +27,13 @@ export interface BoundRequest {
 }
 
 export interface CheckBindingOptions {
-  /** authorization.nonce from the payload. Its signature must already be verified (proposal A.6). */
-  authorizationNonce: Hex;
+  /** The signed commitment the profile extracts (proposal 3.5). Its signature must already be verified (A.6). */
+  signedCommitment: Hex;
   /** Request as served, with url = the resource.url the resource server issued for this route (proposal 3.3). */
   request: RequestDescriptor;
   /** Keys accepted now, including old ones still in their grace period (proposal 4.4). */
   keys: readonly SellerKey[];
-  /** Set when an envelope is stored for this nonce: the key may since have been rotated out (proposal 8.1). */
+  /** Set when an envelope is stored for this commitment: the key may since have been rotated out (proposal 8.1). */
   skipKeyCheck?: boolean;
 }
 
@@ -77,7 +77,7 @@ export function checkBinding(info: PaymentPayloadInfo | undefined, opts: CheckBi
   } catch {
     throw fail('response_encryption_nonce_mismatch');
   }
-  if (toHex(nonce) !== opts.authorizationNonce.toLowerCase()) throw fail('response_encryption_nonce_mismatch');
+  if (toHex(nonce) !== opts.signedCommitment.toLowerCase()) throw fail('response_encryption_nonce_mismatch');
 
   return { ephemeralPublicKey, requestHash: reqHash, key };
 }

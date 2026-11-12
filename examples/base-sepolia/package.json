@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "demo": "tsx demo.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "demo:permit2": "tsx demo.ts --permit2"
   },
   "dependencies": {
     "@x402-response-encryption/core": "0.1.0",

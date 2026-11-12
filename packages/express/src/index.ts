@@ -20,27 +20,30 @@ import {
   ResponseEncryptionError,
   SUITE,
   VERSION,
-  authorizationDigest,
+  X402_EXACT_PERMIT2_PROXY,
   checkBinding,
+  equalBytes,
+  fromHex,
+  paymentView,
   sellerKeyFromPrivate,
   sealResponse,
   toHex,
-  transferAuthorizationTypedData,
   type BoundRequest,
   type Envelope,
   type SellerKey,
   type PaymentPayloadInfo,
   type PaymentRequiredInfo,
   type ServerErrorReason,
+  type AssetTransferMethod,
+  type PaymentView,
   type TokenDomain,
-  type TransferAuthorization,
 } from '@x402-response-encryption/core';
 import { decodePaymentSignatureHeader, encodePaymentRequiredHeader, encodePaymentResponseHeader } from '@x402/core/http';
 import type { PaymentPayload, PaymentRequired, ResourceServerExtension, SettleResponse } from '@x402/core/types';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { brotliDecompress, gunzip, inflate, type InputType } from 'node:zlib';
 import { promisify } from 'node:util';
-import { getAddress, recoverTypedDataAddress, type Address, type Hex } from 'viem';
+import { getAddress, type Address, type Hex } from 'viem';
 
 export interface SellerKeyConfig {
   privateKey: Uint8Array;
@@ -49,14 +52,15 @@ export interface SellerKeyConfig {
   kid?: string;
 }
 
+/** Keyed by the signed commitment c (proposal 8.1), the authorization nonce in EIP-3009 and Permit2. */
 export interface EnvelopeStore {
-  get(nonce: string): Promise<StoredResponse | undefined>;
-  set(nonce: string, value: StoredResponse, ttlSeconds: number): Promise<void>;
+  get(commitment: string): Promise<StoredResponse | undefined>;
+  set(commitment: string, value: StoredResponse, ttlSeconds: number): Promise<void>;
 }
 
 export interface StoredResponse {
   envelope: Envelope;
-  /** EIP-712 digest of the authorization that produced the envelope; a retry must present the same one (proposal 8.1). */
+  /** authorizationDigest (EIP-712 digest) of the payment that produced the envelope; a retry must present the same one (proposal 8.1). */
   authorizationDigest: Hex;
   /** Present when this process settled the payment (deployment A). */
   settlement?: SettleResponse;
@@ -88,9 +92,11 @@ export interface ResponseEncryptionOptions extends CommonOptions {
 export interface AcceptedPayment {
   network: `${string}:${string}`;
   asset: Address;
-  /** EIP-712 domain name and version of the token, as in the route's `extra`. */
-  name: string;
-  version: string;
+  /** Default 'eip3009'. */
+  assetTransferMethod?: AssetTransferMethod;
+  /** EIP-712 domain name and version of the token, as in the route's `extra`. Required for EIP-3009. */
+  name?: string;
+  version?: string;
   /** Minimum `value` in the token's base units. */
   amount: string;
 }
@@ -261,27 +267,21 @@ function paymentFromRequest(req: Request): PaymentPayload | undefined {
 }
 
 const payloadInfoOf = (p: PaymentPayload) => (p.extensions?.[EXTENSION_KEY] as { info?: PaymentPayloadInfo } | undefined)?.info;
-const authorizationOf = (p: { payload: unknown }) => (p.payload as { authorization?: TransferAuthorization }).authorization;
-const nonceOf = (p: { payload: unknown }) => String(authorizationOf(p)?.nonce).toLowerCase();
+const domainOf = (network: string, asset: string, extra: { name?: string; version?: string } | undefined): TokenDomain | undefined =>
+  extra?.name && extra.version
+    ? { name: extra.name, version: extra.version, chainId: Number(network.split(':')[1]), verifyingContract: getAddress(asset) }
+    : undefined;
 
-const domainOf = (network: string, asset: string, extra: { name: string; version: string }): TokenDomain => ({
-  name: extra.name,
-  version: extra.version,
-  chainId: Number(network.split(':')[1]),
-  verifyingContract: getAddress(asset),
-});
+/** The payment seen through its profile (proposal 3.5); the token domain comes from `accepted` unless given. */
+type PaymentLike = Pick<PaymentPayload, 'payload'> & { accepted: Pick<PaymentPayload['accepted'], 'network' | 'asset' | 'extra'> };
+const viewWith = (p: PaymentLike, tokenDomain: TokenDomain | undefined): PaymentView | undefined =>
+  paymentView(p.payload, { chainId: Number(p.accepted.network.split(':')[1]), tokenDomain });
 
-const tokenDomainOf = (p: PaymentPayload) => domainOf(p.accepted.network, p.accepted.asset, p.accepted.extra as { name: string; version: string });
+/** Deployment A: x402 has already matched `accepted` against the route's own requirements. */
+const viewOf = (p: PaymentLike): PaymentView | undefined =>
+  viewWith(p, domainOf(p.accepted.network, p.accepted.asset, p.accepted.extra as { name?: string; version?: string }));
 
-const digestHex = (domain: TokenDomain, auth: TransferAuthorization) => toHex(authorizationDigest(domain, auth)) as Hex;
-
-async function signerMatches(p: PaymentPayload, auth: TransferAuthorization, domain: TokenDomain = tokenDomainOf(p)): Promise<boolean> {
-  const signer = await recoverTypedDataAddress({
-    ...transferAuthorizationTypedData(domain, auth),
-    signature: (p.payload as { signature: Hex }).signature,
-  }).catch(() => undefined);
-  return !!signer && getAddress(signer) === getAddress(auth.from);
-}
+const commitmentOf = (p: PaymentLike) => viewOf(p)?.commitment ?? '';
 
 /** State and steps shared by both deployments. */
 function sellerCore(opts: CommonOptions & { resourceUrl: ResourceUrlOf }) {
@@ -309,10 +309,14 @@ function sellerCore(opts: CommonOptions & { resourceUrl: ResourceUrlOf }) {
   };
 
   /** Binding check. On failure it sends the 402 itself and returns undefined (proposal 3.1, A.6). */
-  const bind = (req: Request, res: Response, payment: PaymentPayload, skipKeyCheck = false): BoundRequest | undefined => {
+  const bind = (req: Request, res: Response, payment: PaymentPayload, view: PaymentView | undefined, skipKeyCheck = false): BoundRequest | undefined => {
+    if (!view) {
+      reject(res, payment, 'response_encryption_nonce_mismatch');
+      return undefined;
+    }
     try {
       return checkBinding(payloadInfoOf(payment), {
-        authorizationNonce: authorizationOf(payment)!.nonce,
+        signedCommitment: view.commitment,
         request: requestOf(req),
         keys,
         skipKeyCheck,
@@ -332,8 +336,7 @@ function sellerCore(opts: CommonOptions & { resourceUrl: ResourceUrlOf }) {
   };
 
   /** Buffers the handler's output and replaces a 2xx body with its envelope. Never falls back to plaintext (proposal 8). */
-  const sealOnEnd = (res: Response, payment: PaymentPayload, domain: TokenDomain, bound: BoundRequest, onSealed: (e: Envelope) => void) => {
-    const digest = authorizationDigest(domain, authorizationOf(payment)!);
+  const sealOnEnd = (res: Response, payment: PaymentPayload, digest: Uint8Array, bound: BoundRequest, onSealed: (e: Envelope) => void) => {
     const chunks: Buffer[] = [];
     const write = res.write.bind(res);
     const end = res.end.bind(res);
@@ -393,16 +396,16 @@ export function createResponseEncryption(opts: ResponseEncryptionOptions) {
     ...responseEncryptionExtension(m.info),
     hooks: {
       onAfterSettle: async (_decl, ctx) => {
-        const nonce = nonceOf(ctx.paymentPayload);
-        const sealed = pending.get(nonce);
+        const c = commitmentOf(ctx.paymentPayload);
+        const sealed = pending.get(c);
         try {
-          if (sealed && ctx.result.success) await m.store.set(nonce, { ...sealed, settlement: ctx.result as SettleResponse }, m.retention);
+          if (sealed && ctx.result.success) await m.store.set(c, { ...sealed, settlement: ctx.result as SettleResponse }, m.retention);
         } finally {
-          release(nonce);
+          release(c);
         }
       },
-      onSettleFailure: async (_decl, ctx) => release(nonceOf(ctx.paymentPayload)),
-      onVerifiedPaymentCanceled: async (_decl, ctx) => release(nonceOf(ctx.paymentPayload)),
+      onSettleFailure: async (_decl, ctx) => release(commitmentOf(ctx.paymentPayload)),
+      onVerifiedPaymentCanceled: async (_decl, ctx) => release(commitmentOf(ctx.paymentPayload)),
     },
   };
 
@@ -411,9 +414,9 @@ export function createResponseEncryption(opts: ResponseEncryptionOptions) {
     try {
       if (!(await readBodyOr415(req, res))) return;
       const payment = paymentFromRequest(req);
-      const auth = payment && authorizationOf(payment);
-      if (!payment || !payloadInfoOf(payment) || !auth?.nonce) return next();
-      const nonce = auth.nonce.toLowerCase();
+      const view = payment && viewOf(payment);
+      if (!payment || !payloadInfoOf(payment) || !view) return next();
+      const nonce = view.commitment;
 
       // Held until settlement finishes, so a duplicate waits and then finds the stored envelope.
       const unlock = await locks.acquire(nonce);
@@ -428,8 +431,8 @@ export function createResponseEncryption(opts: ResponseEncryptionOptions) {
         unlock();
         // Retry of a settled payment: the same signed authorization and binding, then the stored bytes (proposal 8.1).
         // Anything else goes to x402, whose facilitator rejects the used nonce.
-        if (digestHex(tokenDomainOf(payment), auth) !== stored.authorizationDigest || !(await signerMatches(payment, auth))) return next();
-        if (m.bind(req, res, payment, true)) m.sendStored(res, stored);
+        if (toHex(view.digest) !== stored.authorizationDigest || !(await view.signerMatches())) return next();
+        if (m.bind(req, res, payment, view, true)) m.sendStored(res, stored);
         return;
       }
       // Requests that never reach settlement must not hold the lock.
@@ -447,15 +450,16 @@ export function createResponseEncryption(opts: ResponseEncryptionOptions) {
     // A HEAD response has no body to carry the envelope; refusing here cancels settlement (proposal 7.3).
     if (req.method === 'HEAD') return void res.status(405).json({ error: 'HEAD is not supported for encrypted resources' });
     let bound;
+    let view: PaymentView | undefined;
     try {
-      bound = m.bind(req, res, payment);
+      view = viewOf(payment);
+      bound = m.bind(req, res, payment, view);
     } catch (err) {
       return next(err);
     }
-    if (!bound) return;
-    const domain = tokenDomainOf(payment);
-    const digest = digestHex(domain, authorizationOf(payment)!);
-    m.sealOnEnd(res, payment, domain, bound, (envelope) => pending.set(nonceOf(payment), { envelope, authorizationDigest: digest }));
+    if (!bound || !view) return;
+    const { commitment, digest } = view;
+    m.sealOnEnd(res, payment, digest, bound, (envelope) => pending.set(commitment, { envelope, authorizationDigest: toHex(digest) }));
     next();
   };
 
@@ -469,12 +473,24 @@ export function createResponseEncryption(opts: ResponseEncryptionOptions) {
  * against its own payment terms and the binding before it encrypts.
  */
 export function createOriginEncryption(opts: OriginEncryptionOptions): RequestHandler {
+  for (const a of opts.accepts) {
+    if ((a.assetTransferMethod ?? 'eip3009') === 'eip3009' && (!a.name || !a.version)) {
+      throw new Error(`accepts entry for ${a.asset} on ${a.network}: EIP-3009 terms need the token's EIP-712 name and version`);
+    }
+  }
   const m = sellerCore(opts);
   const now = opts.now ?? (() => Math.floor(Date.now() / 1000));
   const locks = nonceLocks();
   const refuse = (res: Response, errorReason: string) => res.status(402).json({ errorReason });
+  // Decodes keyId exactly as checkBinding does, so the key whose payTo is checked is the key that encrypts.
   const payToOf = (keyId: string | undefined) => {
-    const i = keyId ? m.keys.findIndex((k) => toHex(k.keyId) === keyId.toLowerCase()) : -1;
+    let id: Uint8Array;
+    try {
+      id = fromHex(keyId ?? '');
+    } catch {
+      return undefined;
+    }
+    const i = m.keys.findIndex((k) => equalBytes(k.keyId, id));
     return i < 0 ? undefined : getAddress(opts.keys[i]!.attestation.payTo);
   };
 
@@ -484,20 +500,32 @@ export function createOriginEncryption(opts: OriginEncryptionOptions): RequestHa
       if (req.method === 'HEAD') return void res.status(405).json({ error: 'HEAD is not supported for encrypted resources' });
       if (!(await readBodyOr415(req, res))) return;
       const payment = paymentFromRequest(req);
-      const auth = payment && authorizationOf(payment);
       // The gateway did not forward a payment for a covered route.
-      if (!payment || !auth?.nonce) return refuse(res, 'response_encryption_extension_missing');
+      if (!payment || !payment.payload) return refuse(res, 'response_encryption_extension_missing');
 
       // Verify against the origin's own terms, never the payload's claimed token or price.
+      const method: AssetTransferMethod = 'permit2Authorization' in payment.payload ? 'permit2' : 'eip3009';
       const terms = opts.accepts.find(
-        (a) => a.network === payment.accepted.network && getAddress(a.asset) === getAddress(payment.accepted.asset),
+        (a) =>
+          a.network === payment.accepted.network &&
+          getAddress(a.asset) === getAddress(payment.accepted.asset) &&
+          (a.assetTransferMethod ?? 'eip3009') === method,
       );
-      const domain = terms && domainOf(terms.network, terms.asset, terms);
-      if (!terms || !domain || BigInt(auth.value) < BigInt(terms.amount) || !(await signerMatches(payment, auth, domain))) {
+      // The token domain comes only from the origin's terms, never from the payload (EIP-3009 terms always carry one).
+      const view = terms && viewWith(payment, domainOf(terms.network, terms.asset, terms));
+      if (
+        !terms ||
+        !view ||
+        view.method !== method ||
+        view.token !== getAddress(terms.asset) ||
+        (view.method === 'permit2' && view.spender !== getAddress(X402_EXACT_PERMIT2_PROXY)) ||
+        view.value < BigInt(terms.amount) ||
+        !(await view.signerMatches())
+      ) {
         return refuse(res, 'invalid_payment_authorization');
       }
-      const nonce = auth.nonce.toLowerCase();
-      const digest = digestHex(domain, auth);
+      const nonce = view.commitment;
+      const digest = toHex(view.digest);
 
       const unlock = await locks.acquire(nonce);
       let sealing = false;
@@ -506,21 +534,21 @@ export function createOriginEncryption(opts: OriginEncryptionOptions): RequestHa
         if (stored) {
           // Retry: the same signed authorization gets the same bytes, even after validBefore (proposal 8.1).
           if (stored.authorizationDigest !== digest) return refuse(res, 'invalid_payment_authorization');
-          if (m.bind(req, res, payment, true)) m.sendStored(res, stored);
+          if (m.bind(req, res, payment, view, true)) m.sendStored(res, stored);
           return;
         }
         // A new execution: the authorization must still be spendable and pay the payTo that attested the key named in the payload.
         const t = now();
         const payTo = payToOf(payloadInfoOf(payment)?.keyId);
-        if (Number(auth.validAfter) > t || Number(auth.validBefore) <= t || (payTo && getAddress(auth.to) !== payTo)) {
+        if (view.validAfter > BigInt(t) || view.validBefore <= BigInt(t) || !payTo || view.to !== payTo) {
           return refuse(res, 'invalid_payment_authorization');
         }
-        const bound = m.bind(req, res, payment);
+        const bound = m.bind(req, res, payment, view);
         if (!bound) return;
         // Settlement happens at the gateway. Keep the envelope so a resend of the same payload gets the same bytes.
         sealing = true;
         let saved: Promise<void> = Promise.resolve();
-        m.sealOnEnd(res, payment, domain, bound, (envelope) => {
+        m.sealOnEnd(res, payment, view.digest, bound, (envelope) => {
           saved = m.store.set(nonce, { envelope, authorizationDigest: digest }, m.retention);
         });
         res.on('close', () => void saved.catch(() => undefined).finally(unlock));

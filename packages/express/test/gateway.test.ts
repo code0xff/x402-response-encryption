@@ -145,7 +145,7 @@ async function resign(header: string, change: { auth?: Record<string, string>; d
   const auth = { ...p.payload.authorization, from: signer.address, ...change.auth };
   const terms = { ...USDC, ...change.domain };
   p.accepted = { ...p.accepted, asset: terms.asset, extra: { ...p.accepted.extra, name: terms.name, version: terms.version } };
-  const domain = { name: terms.name, version: terms.version, chainId: CHAIN_ID, verifyingContract: terms.asset };
+  const domain = { name: terms.name!, version: terms.version!, chainId: CHAIN_ID, verifyingContract: terms.asset };
   p.payload = { authorization: auth, signature: await signer.signTypedData(transferAuthorizationTypedData(domain, auth)) };
   return encode(p);
 }
@@ -231,6 +231,20 @@ describe('origin checks its own payment terms', () => {
   });
 });
 
+it.each([
+  ['prefixed', (k: string) => k],
+  ['unprefixed', (k: string) => k.slice(2)],
+])('refuses a payment to another recipient whatever the keyId spelling (%s)', async (_name, spell) => {
+  const attacker = privateKeyToAccount(hex(testKey('gateway-own-payTo')));
+  const p = decode(await resign(await signedHeader(), { auth: { to: attacker.address } }));
+  const info = p.extensions['response-encryption'].info;
+  info.keyId = spell(info.keyId);
+  const res = await toOrigin(encode(p));
+  expect(res.status).toBe(402);
+  expect((await res.json()).errorReason).toBe('invalid_payment_authorization');
+  expect(executions).toBe(0);
+});
+
 describe('origin retries and duplicates', () => {
   it('runs the handler once for concurrent duplicates and returns the same envelope', async () => {
     const header = await signedHeader();
@@ -276,5 +290,15 @@ describe('request content encoding', () => {
     expect((await toOrigin(header, '/internal/report', { headers: { 'content-encoding': 'compress' } })).status).toBe(415);
     expect((await toOrigin(header, '/internal/report', { body: 'not gzip', headers: { 'content-encoding': 'gzip' } })).status).toBe(415);
     expect(executions).toBe(0);
+  });
+});
+
+describe('origin configuration', () => {
+  it('refuses EIP-3009 terms without a trusted token domain, so a payload-supplied domain is never used', async () => {
+    const k = await keyConfig('enc-config');
+    const { name: _n, version: _v, ...noDomain } = USDC;
+    expect(() =>
+      createOriginEncryption({ keys: [k], accepts: [noDomain], fromGateway: () => true, resourceUrl: () => 'https://gateway.example/v1/report' }),
+    ).toThrow(/EIP-712 name and version/);
   });
 });

@@ -12,6 +12,7 @@
     "build": "npm run build -w packages/core -w packages/fetch -w packages/express",
     "test": "npm run build -w packages/core -w packages/fetch && npm test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces",
-    "demo": "npm run build && npm run demo -w examples/base-sepolia"
+    "demo": "npm run build && npm run demo -w examples/base-sepolia",
+    "demo:permit2": "npm run build && npm run demo:permit2 -w examples/base-sepolia"
   }
 }

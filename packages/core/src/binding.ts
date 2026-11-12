@@ -24,7 +24,7 @@ export function requestHash(req: RequestDescriptor): Uint8Array {
   );
 }
 
-/** EIP-3009 nonce committing the client's ephemeral key, the seller key from the 402 and the request (proposal 3.1). */
+/** Binding commitment c (the EIP-3009 nonce, the Permit2 nonce) committing the client's ephemeral key, the seller key from the 402 and the request (proposal 3.1). */
 export function bindingNonce(ephemeralPublicKey: Uint8Array, keyId: Uint8Array, reqHash: Uint8Array, nonceSalt: Uint8Array): Uint8Array {
   if (keyId.length !== 32 || reqHash.length !== 32 || nonceSalt.length !== 32) throw new Error('keyId, requestHash and nonceSalt must be 32 bytes');
   return keccak_256(concat(TAG.nonce, ephemeralPublicKey, keyId, reqHash, nonceSalt));

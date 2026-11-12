@@ -12,6 +12,7 @@ import {
   fromHex,
   sellerKeyFromPrivate,
   openResponse,
+  paymentView,
   sealResponse,
   toHex,
   transferAuthorizationTypedData,
@@ -30,6 +31,7 @@ const load = (name: string) => JSON.parse(readFileSync(new URL(name, dir), 'utf8
 const vector = load('vector-1.json');
 const negative = load('negative-cases.json');
 const urlCases = load('url-cases.json');
+const permit2 = load('vector-permit2.json');
 
 const chainIdOf = (caip2: string) => Number(caip2.split(':')[1]);
 
@@ -63,7 +65,7 @@ describe('vector-1', () => {
     const digest = authorizationDigest(inputs.tokenDomain, authorization);
     expect(toHex(digest)).toBe(intermediate.authorizationDigest);
 
-    const bound = checkBinding(binding.payloadInfo, { authorizationNonce: binding.nonce, request: inputs.request, keys: [seller] });
+    const bound = checkBinding(binding.payloadInfo, { signedCommitment: binding.nonce, request: inputs.request, keys: [seller] });
     const envelope = sealResponse(
       bound,
       inputs.network,
@@ -118,7 +120,7 @@ async function runCase(c: any): Promise<Stage> {
       return { stage: 'seller', reason: 'invalid_exact_evm_payload_signature' };
     }
     const payload: PaymentPayloadInfo | undefined = w.paymentPayload.extension?.info;
-    checkBinding(payload, { authorizationNonce: auth.nonce, request: w.request, keys, skipKeyCheck: !!stored });
+    checkBinding(payload, { signedCommitment: auth.nonce, request: w.request, keys, skipKeyCheck: !!stored });
   } catch (err) {
     return reject('seller', err);
   }
@@ -181,6 +183,49 @@ describe('URL canonicalization', () => {
       } else {
         expect(canonicalUrl(c.input)).toBe(c.canonical);
       }
+    });
+  }
+});
+
+describe('vector-permit2 (proposal 3.5, A.9)', () => {
+  const { inputs, intermediate, output, cases } = permit2;
+  const chainId = chainIdOf(inputs.network);
+  const seller = sellerKeyFromPrivate(fromHex(inputs.sellerEncryptionPrivateKey));
+  const ctx = { chainId };
+
+  it('extracts c and the digest, and the envelope decrypts', async () => {
+    const valid = cases.find((c: { id: string }) => c.id === 'valid').wire;
+    const view = paymentView(valid.payload, ctx)!;
+    expect(view.method).toBe('permit2');
+    expect(view.commitment).toBe(intermediate.commitment);
+    expect(toHex(view.digest)).toBe(intermediate.authorizationDigest);
+    expect(await view.signerMatches()).toBe(true);
+    const bound = checkBinding(valid.extension as PaymentPayloadInfo, {
+      signedCommitment: view.commitment,
+      request: valid.request,
+      keys: [seller],
+    });
+    const env = sealResponse(bound, inputs.network, view.digest, {
+      status: inputs.response.status,
+      contentType: inputs.response.contentType,
+      body: utf8Bytes(inputs.response.body),
+    }, fromHex(inputs.iv));
+    expect(env).toEqual(output.envelope);
+  });
+
+  for (const c of cases) {
+    it(`case ${c.id}`, async () => {
+      const view = paymentView(c.wire.payload, ctx)!;
+      let reason: string | null = null;
+      if (!(await view.signerMatches())) reason = 'invalid_permit2_signature';
+      else {
+        try {
+          checkBinding(c.wire.extension, { signedCommitment: view.commitment, request: c.wire.request, keys: [seller] });
+        } catch (err) {
+          reason = (err as ResponseEncryptionError).reason;
+        }
+      }
+      expect(reason).toBe(c.expect?.reason ?? null);
     });
   }
 });
