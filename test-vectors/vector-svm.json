@@ -1,0 +1,281 @@
+{
+  "description": "x402 response-encryption v1, SVM profile (proposal 3.5). All private keys are test-only. Token accounts are placeholders.",
+  "profile": "svm",
+  "inputs": {
+    "clientEphemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+    "sellerEncryptionPrivateKey": "0xa909a894d6dc8da31094ac24de7fb87d70c2de50fe82e97222283124988db64a",
+    "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2",
+    "iv": "0x93c441cc53842071e3e675de",
+    "request": {
+      "method": "POST",
+      "url": "https://api.seller.example/v1/report?id=42",
+      "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+    },
+    "response": {
+      "status": 200,
+      "contentType": "application/json",
+      "body": "{\"city\":\"Seoul\",\"tempC\":12.5,\"condition\":\"clear\"}"
+    },
+    "network": "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+    "clientOwnerSeed": "0x4b1e494e4640ab2b61f47644d466f2aefd55c12797f2fbff855e2a5c3e9d57e6",
+    "feePayerSeed": "0x2a233abf3ff0605a759bf1a161cd7520baed770997fc9adade5a390f7d276cbc",
+    "accounts": {
+      "sourceAta": "6toQw14iB2GeAYQu9nU1wrRau3euueYWfR5XysbnRuyu",
+      "destinationAta": "6FdLFGNxYMh2rkhzstNdksgrQVLwWAu4kvKxPo8V23Hx",
+      "mint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
+    },
+    "recentBlockhash": "2tQdN9oxBjoENQBcuWuT1W1wCws7ZsZWhwBXxh1Ns5to",
+    "computeUnitLimit": 20000,
+    "computeUnitPriceMicrolamports": 1,
+    "amount": 10000,
+    "decimals": 6,
+    "programs": {
+      "memo": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+      "memoV1": "Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo",
+      "token": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "computeBudget": "ComputeBudget111111111111111111111111111111"
+    }
+  },
+  "intermediate": {
+    "clientEphemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+    "sellerEncryptionPublicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+    "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+    "requestHash": "0xaddb061176dc73513853d4d1fda865b14129e70f4c96929c01f45758d32ca8d7",
+    "commitment": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c",
+    "clientOwner": "8swSrgebogveDyh7JFoZigFGMgnTHcP3ooZeBvbcHK9r",
+    "feePayer": "6rciUUkb2knhvq3oJY2okYSDaHdQnc8vuyvA72KAqoiF",
+    "memo": "aafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c",
+    "message": "gAIBBQlXAEcFmDH4cnURoeFSsEDIIR3rRuT4TEhMwNHT5TwoYHUOaTeavU7r5dfeELSU17t4Wki5fju1nI3qyV24y7q5V4+I6Dyv+nr0TyM2tbcW6Ce/CDStsUMTgTR0OIf5AYROCaWAH9VNFEzmzeR4y3YdJtHsOk7JcILhVLvHNK5K5ztELLORIVfxOpM9ATQoLQMrX/7NAaLb8bd5BgjfAC6nBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNBUpTUPhdyILWFKVWcniKKW3fHqur0KYGeIhJMvTu9qAcBwX21fnJZMCWm9Er6ws7oSz3pK2+Y+yrDqyiO9+z7AQGAAUCIE4AAAYACQMBAAAAAAAAAAUEAgQDAQoMECcAAAAAAAAGBwBAYWFmYTk0NTQ2Nzk5MmViNGNjOWEyMjZmNTE0NzYwNzZhZjkyYWE3NGRjYzFkZWEwZDNlNzJhOGNiODA3ODIyYwA=",
+    "authorizationDigest": "0xc0cf0fe61e18ceb37f604ecc731ef49789d0bbb75fc11f27973f335f65498caf",
+    "sharedSecretZ": "0x210c4ffe603fe94e316f28715c2cadc0f6f21f6a56e482c4db14485b66a2db86",
+    "hkdfInfo": "0x783430322d726573706f6e73652d656e6372797074696f6e2f76312f726573706f6e736503abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cecc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a00000027736f6c616e613a457457545241425a61597136694d6665594b6f75527531363656553278716131addb061176dc73513853d4d1fda865b14129e70f4c96929c01f45758d32ca8d7",
+    "aesKey": "0x9358c1372300aeceac1376d35cfad889d1a4f7689787c25221f44b1fceda0e6f",
+    "aad": "0x783430322d726573706f6e73652d656e6372797074696f6e2f76312f61616401c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a00c8000000106170706c69636174696f6e2f6a736f6e"
+  },
+  "output": {
+    "envelope": {
+      "version": 1,
+      "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+      "status": 200,
+      "contentType": "application/json",
+      "iv": "k8RBzFOEIHHj5nXe",
+      "ciphertext": "asl8SsPf3lP87dPTnQaFNnTf--hrdLfk1QomlnkCkFoKctnna737eXjTdt0Gk8Ce6qeAs6-ys3VALUFq0_GNGJI"
+    }
+  },
+  "cases": [
+    {
+      "id": "valid",
+      "description": "No tampering.",
+      "wire": {
+        "payload": {
+          "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACWFwTsO/CReYH2Vkn2QmQBAG4ywvLzxk5SR0EyLb22E2rLOO1CTyuZDGfrOBuZ5IU0bt2eVtVH423kWWpUBwEIgAIBBQlXAEcFmDH4cnURoeFSsEDIIR3rRuT4TEhMwNHT5TwoYHUOaTeavU7r5dfeELSU17t4Wki5fju1nI3qyV24y7q5V4+I6Dyv+nr0TyM2tbcW6Ce/CDStsUMTgTR0OIf5AYROCaWAH9VNFEzmzeR4y3YdJtHsOk7JcILhVLvHNK5K5ztELLORIVfxOpM9ATQoLQMrX/7NAaLb8bd5BgjfAC6nBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNBUpTUPhdyILWFKVWcniKKW3fHqur0KYGeIhJMvTu9qAcBwX21fnJZMCWm9Er6ws7oSz3pK2+Y+yrDqyiO9+z7AQGAAUCIE4AAAYACQMBAAAAAAAAAAUEAgQDAQoMECcAAAAAAAAGBwBAYWFmYTk0NTQ2Nzk5MmViNGNjOWEyMjZmNTE0NzYwNzZhZjkyYWE3NGRjYzFkZWEwZDNlNzJhOGNiODA3ODIyYwA="
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": null
+    },
+    {
+      "id": "memo-replaced",
+      "description": "Intermediary replaces the memo with a commitment to its own ephemeral key; the client signature no longer matches.",
+      "wire": {
+        "payload": {
+          "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACWFwTsO/CReYH2Vkn2QmQBAG4ywvLzxk5SR0EyLb22E2rLOO1CTyuZDGfrOBuZ5IU0bt2eVtVH423kWWpUBwEIgAIBBQlXAEcFmDH4cnURoeFSsEDIIR3rRuT4TEhMwNHT5TwoYHUOaTeavU7r5dfeELSU17t4Wki5fju1nI3qyV24y7q5V4+I6Dyv+nr0TyM2tbcW6Ce/CDStsUMTgTR0OIf5AYROCaWAH9VNFEzmzeR4y3YdJtHsOk7JcILhVLvHNK5K5ztELLORIVfxOpM9ATQoLQMrX/7NAaLb8bd5BgjfAC6nBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNBUpTUPhdyILWFKVWcniKKW3fHqur0KYGeIhJMvTu9qAcBwX21fnJZMCWm9Er6ws7oSz3pK2+Y+yrDqyiO9+z7AQGAAUCIE4AAAYACQMBAAAAAAAAAAUEAgQDAQoMECcAAAAAAAAGBwBAMDM4NWY3ZWIxZmMwYWNmYzc0Y2UzNmRjOWZiNWI2MzM1NDQwNTFkMzI2ZTU0YWQzMjM2Yjc2OTcwY2VhNzI5OQA="
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x0230210833df4db7c5ac5566c6d77a09fca95fb6fc53529f7a5741257d92c150ec",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "invalid_exact_svm_payload_signature_invalid"
+      }
+    },
+    {
+      "id": "ephemeral-key-swapped",
+      "description": "Intermediary replaces the ephemeral public key in the extension.",
+      "wire": {
+        "payload": {
+          "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACWFwTsO/CReYH2Vkn2QmQBAG4ywvLzxk5SR0EyLb22E2rLOO1CTyuZDGfrOBuZ5IU0bt2eVtVH423kWWpUBwEIgAIBBQlXAEcFmDH4cnURoeFSsEDIIR3rRuT4TEhMwNHT5TwoYHUOaTeavU7r5dfeELSU17t4Wki5fju1nI3qyV24y7q5V4+I6Dyv+nr0TyM2tbcW6Ce/CDStsUMTgTR0OIf5AYROCaWAH9VNFEzmzeR4y3YdJtHsOk7JcILhVLvHNK5K5ztELLORIVfxOpM9ATQoLQMrX/7NAaLb8bd5BgjfAC6nBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNBUpTUPhdyILWFKVWcniKKW3fHqur0KYGeIhJMvTu9qAcBwX21fnJZMCWm9Er6ws7oSz3pK2+Y+yrDqyiO9+z7AQGAAUCIE4AAAYACQMBAAAAAAAAAAUEAgQDAQoMECcAAAAAAAAGBwBAYWFmYTk0NTQ2Nzk5MmViNGNjOWEyMjZmNTE0NzYwNzZhZjkyYWE3NGRjYzFkZWEwZDNlNzJhOGNiODA3ODIyYwA="
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x0230210833df4db7c5ac5566c6d77a09fca95fb6fc53529f7a5741257d92c150ec",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "request-body-changed",
+      "description": "Intermediary changes the request body.",
+      "wire": {
+        "payload": {
+          "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACWFwTsO/CReYH2Vkn2QmQBAG4ywvLzxk5SR0EyLb22E2rLOO1CTyuZDGfrOBuZ5IU0bt2eVtVH423kWWpUBwEIgAIBBQlXAEcFmDH4cnURoeFSsEDIIR3rRuT4TEhMwNHT5TwoYHUOaTeavU7r5dfeELSU17t4Wki5fju1nI3qyV24y7q5V4+I6Dyv+nr0TyM2tbcW6Ce/CDStsUMTgTR0OIf5AYROCaWAH9VNFEzmzeR4y3YdJtHsOk7JcILhVLvHNK5K5ztELLORIVfxOpM9ATQoLQMrX/7NAaLb8bd5BgjfAC6nBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNBUpTUPhdyILWFKVWcniKKW3fHqur0KYGeIhJMvTu9qAcBwX21fnJZMCWm9Er6ws7oSz3pK2+Y+yrDqyiO9+z7AQGAAUCIE4AAAYACQMBAAAAAAAAAAUEAgQDAQoMECcAAAAAAAAGBwBAYWFmYTk0NTQ2Nzk5MmViNGNjOWEyMjZmNTE0NzYwNzZhZjkyYWE3NGRjYzFkZWEwZDNlNzJhOGNiODA3ODIyYwA="
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Busan\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "two-commitment-memos",
+      "description": "Payer signs one transaction carrying commitments for two requests.",
+      "wire": {
+        "payload": {
+          "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABMj3UgVZKTP8ib+B8K+R/aKv02nz7R4Lfnn0AaiUt8iMWw2pJraI1QMcVZ/HI3hY55/LnW2766rT6zkQ8LqCIAgAIBBQlXAEcFmDH4cnURoeFSsEDIIR3rRuT4TEhMwNHT5TwoYHUOaTeavU7r5dfeELSU17t4Wki5fju1nI3qyV24y7q5V4+I6Dyv+nr0TyM2tbcW6Ce/CDStsUMTgTR0OIf5AYROCaWAH9VNFEzmzeR4y3YdJtHsOk7JcILhVLvHNK5K5ztELLORIVfxOpM9ATQoLQMrX/7NAaLb8bd5BgjfAC6nBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNBUpTUPhdyILWFKVWcniKKW3fHqur0KYGeIhJMvTu9qAcBwX21fnJZMCWm9Er6ws7oSz3pK2+Y+yrDqyiO9+z7AUGAAUCIE4AAAYACQMBAAAAAAAAAAUEAgQDAQoMECcAAAAAAAAGBwBAYWFmYTk0NTQ2Nzk5MmViNGNjOWEyMjZmNTE0NzYwNzZhZjkyYWE3NGRjYzFkZWEwZDNlNzJhOGNiODA3ODIyYwcAQDAzODVmN2ViMWZjMGFjZmM3NGNlMzZkYzlmYjViNjMzNTQ0MDUxZDMyNmU1NGFkMzIzNmI3Njk3MGNlYTcyOTkA"
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "extra-memo-v1",
+      "description": "A second memo through the older Memo program.",
+      "wire": {
+        "payload": {
+          "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABKRfiVa1dKMWWsL5ZsoAMgUo9gYT+Hv3YrMZ1lkpS5+c6q+K37rpesc4mJiu24CEKdTM00p9IGvLS/R//D/hgEgAIBBQlXAEcFmDH4cnURoeFSsEDIIR3rRuT4TEhMwNHT5TwoYHUOaTeavU7r5dfeELSU17t4Wki5fju1nI3qyV24y7q5V4+I6Dyv+nr0TyM2tbcW6Ce/CDStsUMTgTR0OIf5AYROCaWAH9VNFEzmzeR4y3YdJtHsOk7JcILhVLvHNK5K5ztELLORIVfxOpM9ATQoLQMrX/7NAaLb8bd5BgjfAC6nBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNBUpTUPhdyILWFKVWcniKKW3fHqur0KYGeIhJMvTu9qAcBwX21fnJZMCWm9Er6ws7oSz3pK2+Y+yrDqyiO9+z7AUGAAUCIE4AAAYACQMBAAAAAAAAAAUEAgQDAQoMECcAAAAAAAAGBwBAYWFmYTk0NTQ2Nzk5MmViNGNjOWEyMjZmNTE0NzYwNzZhZjkyYWE3NGRjYzFkZWEwZDNlNzJhOGNiODA3ODIyYwgABG5vdGUA"
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch",
+        "facilitatorFirst": "invalid_exact_svm_payload_unknown_instruction"
+      }
+    },
+    {
+      "id": "memo-missing",
+      "description": "Signed transaction without a memo.",
+      "wire": {
+        "payload": {
+          "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEkKvgKpWvk5S0uH7AVvp+mDSsMMp/kwcRwVR7Xaq+CabYYnTiJuCXT6abER3cef348nB1iX4cDr2QuGcXQAGgAIBBQlXAEcFmDH4cnURoeFSsEDIIR3rRuT4TEhMwNHT5TwoYHUOaTeavU7r5dfeELSU17t4Wki5fju1nI3qyV24y7q5V4+I6Dyv+nr0TyM2tbcW6Ce/CDStsUMTgTR0OIf5AYROCaWAH9VNFEzmzeR4y3YdJtHsOk7JcILhVLvHNK5K5ztELLORIVfxOpM9ATQoLQMrX/7NAaLb8bd5BgjfAC6nBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNBUpTUPhdyILWFKVWcniKKW3fHqur0KYGeIhJMvTu9qAcBwX21fnJZMCWm9Er6ws7oSz3pK2+Y+yrDqyiO9+z7AMGAAUCIE4AAAYACQMBAAAAAAAAAAUEAgQDAQoMECcAAAAAAAAGAA=="
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "memo-uppercase-hex",
+      "description": "Memo holds c in uppercase hex.",
+      "wire": {
+        "payload": {
+          "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADeKQWU0OKtaUFTSvAeoPTqQwR2MNUICxAXn4OnWtm1TvPoUt5VONiZ/tIAHEpgpPdI5BVxlHNrLG3PPzEc/QEPgAIBBQlXAEcFmDH4cnURoeFSsEDIIR3rRuT4TEhMwNHT5TwoYHUOaTeavU7r5dfeELSU17t4Wki5fju1nI3qyV24y7q5V4+I6Dyv+nr0TyM2tbcW6Ce/CDStsUMTgTR0OIf5AYROCaWAH9VNFEzmzeR4y3YdJtHsOk7JcILhVLvHNK5K5ztELLORIVfxOpM9ATQoLQMrX/7NAaLb8bd5BgjfAC6nBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNBUpTUPhdyILWFKVWcniKKW3fHqur0KYGeIhJMvTu9qAcBwX21fnJZMCWm9Er6ws7oSz3pK2+Y+yrDqyiO9+z7AQGAAUCIE4AAAYACQMBAAAAAAAAAAUEAgQDAQoMECcAAAAAAAAGBwBAQUFGQTk0NTQ2Nzk5MkVCNENDOUEyMjZGNTE0NzYwNzZBRjkyQUE3NERDQzFERUEwRDNFNzJBOENCODA3ODIyQwA="
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "memo-random-nonce",
+      "description": "Memo holds a random 16-byte nonce, as an x402 client without this extension does.",
+      "wire": {
+        "payload": {
+          "transaction": "AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADquUy7E5iARGDOSIxTNVVFHwuXY6KOPBOgE66fVfvmwpIIkLNsSUIh8RjSN3lC/7Li+ws5XHu7SB6ro5j64iwOgAIBBQlXAEcFmDH4cnURoeFSsEDIIR3rRuT4TEhMwNHT5TwoYHUOaTeavU7r5dfeELSU17t4Wki5fju1nI3qyV24y7q5V4+I6Dyv+nr0TyM2tbcW6Ce/CDStsUMTgTR0OIf5AYROCaWAH9VNFEzmzeR4y3YdJtHsOk7JcILhVLvHNK5K5ztELLORIVfxOpM9ATQoLQMrX/7NAaLb8bd5BgjfAC6nBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKkDBkZv5SEXMv/srbpyw5vnvIzlu8X3EmssQ5s6QAAAAAVKU1qZKSEGTSTocWDaOHx8NbXdvJK7geQfqEBBBUSNBUpTUPhdyILWFKVWcniKKW3fHqur0KYGeIhJMvTu9qAcBwX21fnJZMCWm9Er6ws7oSz3pK2+Y+yrDqyiO9+z7AQGAAUCIE4AAAYACQMBAAAAAAAAAAUEAgQDAQoMECcAAAAAAAAGBwAgM2Q4N2I1MTI0N2M3NGRkOTg0YmRhZTdiZjJiZjFlMjQA"
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    }
+  ]
+}

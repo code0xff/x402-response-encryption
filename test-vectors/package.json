@@ -6,7 +6,8 @@
   "scripts": {
     "generate": "tsx generate.ts",
     "generate:urls": "tsx url-cases.ts",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "generate:profiles": "tsx generate-profiles.ts"
   },
   "dependencies": {
     "@noble/curves": "1.4.0",

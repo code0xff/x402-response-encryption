@@ -1,0 +1,317 @@
+{
+  "description": "x402 response-encryption v1, Permit2 profile (proposal 3.5). All private keys are test-only.",
+  "profile": "permit2",
+  "inputs": {
+    "clientEphemeralPrivateKey": "0xec60ea8faf897d220d8a31556ba2702a76d4224f3eb6436edd4179c54bbcea44",
+    "sellerEncryptionPrivateKey": "0xa909a894d6dc8da31094ac24de7fb87d70c2de50fe82e97222283124988db64a",
+    "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2",
+    "iv": "0x93c441cc53842071e3e675de",
+    "request": {
+      "method": "POST",
+      "url": "https://api.seller.example/v1/report?id=42",
+      "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+    },
+    "response": {
+      "status": 200,
+      "contentType": "application/json",
+      "body": "{\"city\":\"Seoul\",\"tempC\":12.5,\"condition\":\"clear\"}"
+    },
+    "payerPrivateKey": "0x05043480f608a94724ad738fea70a32e58d726d9700c061d355f39c7bddec84e",
+    "network": "eip155:84532",
+    "permit2Domain": {
+      "name": "Permit2",
+      "chainId": 84532,
+      "verifyingContract": "0x000000000022D473030F116dDEE9F6B43aC78BA3"
+    },
+    "payTo": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E"
+  },
+  "intermediate": {
+    "clientEphemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+    "sellerEncryptionPublicKey": "0x037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cec",
+    "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+    "requestHash": "0xaddb061176dc73513853d4d1fda865b14129e70f4c96929c01f45758d32ca8d7",
+    "commitment": "0xaafa945467992eb4cc9a226f51476076af92aa74dcc1dea0d3e72a8cb807822c",
+    "payerAddress": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+    "permit2Nonce": "77335919759354908795179317946135673084898666177884518561616512228820284572204",
+    "authorizationDigest": "0xae51d91ca0879752427acb54ca62be506b05a1e4456351d4b967702270260730",
+    "sharedSecretZ": "0x210c4ffe603fe94e316f28715c2cadc0f6f21f6a56e482c4db14485b66a2db86",
+    "hkdfInfo": "0x783430322d726573706f6e73652d656e6372797074696f6e2f76312f726573706f6e736503abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9037ab2893ef16710141c13080781d027c8078b3a70371fb0c2cf33dce0ba6c7cecc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a0000000c6569703135353a3834353332addb061176dc73513853d4d1fda865b14129e70f4c96929c01f45758d32ca8d7",
+    "aesKey": "0x90f68941abf29a7d69126e18be4b44dea34e5721b1f77266f614df7f16857055",
+    "aad": "0x783430322d726573706f6e73652d656e6372797074696f6e2f76312f61616401c6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a00c8000000106170706c69636174696f6e2f6a736f6e"
+  },
+  "output": {
+    "envelope": {
+      "version": 1,
+      "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+      "status": 200,
+      "contentType": "application/json",
+      "iv": "k8RBzFOEIHHj5nXe",
+      "ciphertext": "6UGlkNty_fGGsLArzOk84pI_tdnBDTg4kronJnB907ZvspTflJpXeagkwgEgOs5BAbgYR2NMEoqFmI6fvvjiTjk"
+    }
+  },
+  "cases": [
+    {
+      "id": "valid",
+      "description": "No tampering.",
+      "wire": {
+        "payload": {
+          "signature": "0x371cfd7897627d70fb3169ecc7355ad25db1d8305ee9ec5e0de44a6e0087c4fa2de6d303ae8add937cb56304b71de9e91bcc492750edc8952b12d16dfbf836d71b",
+          "permit2Authorization": {
+            "permitted": {
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "amount": "10000"
+            },
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "spender": "0x402085c248EeA27D92E8b30b2C58ed07f9E20001",
+            "nonce": "77335919759354908795179317946135673084898666177884518561616512228820284572204",
+            "deadline": "1893456000",
+            "witness": {
+              "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+              "validAfter": "0"
+            }
+          }
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": null
+    },
+    {
+      "id": "nonce-changed",
+      "description": "Intermediary rewrites permit2Authorization.nonce.",
+      "wire": {
+        "payload": {
+          "signature": "0x371cfd7897627d70fb3169ecc7355ad25db1d8305ee9ec5e0de44a6e0087c4fa2de6d303ae8add937cb56304b71de9e91bcc492750edc8952b12d16dfbf836d71b",
+          "permit2Authorization": {
+            "permitted": {
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "amount": "10000"
+            },
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "spender": "0x402085c248EeA27D92E8b30b2C58ed07f9E20001",
+            "nonce": "1593640275644391569124402851222255095425273265793488902553467318247011021465",
+            "deadline": "1893456000",
+            "witness": {
+              "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+              "validAfter": "0"
+            }
+          }
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "invalid_permit2_signature"
+      }
+    },
+    {
+      "id": "ephemeral-key-swapped",
+      "description": "Intermediary replaces the ephemeral public key in the extension.",
+      "wire": {
+        "payload": {
+          "signature": "0x371cfd7897627d70fb3169ecc7355ad25db1d8305ee9ec5e0de44a6e0087c4fa2de6d303ae8add937cb56304b71de9e91bcc492750edc8952b12d16dfbf836d71b",
+          "permit2Authorization": {
+            "permitted": {
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "amount": "10000"
+            },
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "spender": "0x402085c248EeA27D92E8b30b2C58ed07f9E20001",
+            "nonce": "77335919759354908795179317946135673084898666177884518561616512228820284572204",
+            "deadline": "1893456000",
+            "witness": {
+              "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+              "validAfter": "0"
+            }
+          }
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x0230210833df4db7c5ac5566c6d77a09fca95fb6fc53529f7a5741257d92c150ec",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "ephemeral-key-and-nonce-swapped",
+      "description": "Intermediary replaces the ephemeral key and rewrites the nonce to match.",
+      "wire": {
+        "payload": {
+          "signature": "0x371cfd7897627d70fb3169ecc7355ad25db1d8305ee9ec5e0de44a6e0087c4fa2de6d303ae8add937cb56304b71de9e91bcc492750edc8952b12d16dfbf836d71b",
+          "permit2Authorization": {
+            "permitted": {
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "amount": "10000"
+            },
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "spender": "0x402085c248EeA27D92E8b30b2C58ed07f9E20001",
+            "nonce": "1593640275644391569124402851222255095425273265793488902553467318247011021465",
+            "deadline": "1893456000",
+            "witness": {
+              "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+              "validAfter": "0"
+            }
+          }
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x0230210833df4db7c5ac5566c6d77a09fca95fb6fc53529f7a5741257d92c150ec",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "invalid_permit2_signature"
+      }
+    },
+    {
+      "id": "witness-to-changed",
+      "description": "Intermediary redirects witness.to.",
+      "wire": {
+        "payload": {
+          "signature": "0x371cfd7897627d70fb3169ecc7355ad25db1d8305ee9ec5e0de44a6e0087c4fa2de6d303ae8add937cb56304b71de9e91bcc492750edc8952b12d16dfbf836d71b",
+          "permit2Authorization": {
+            "permitted": {
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "amount": "10000"
+            },
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "spender": "0x402085c248EeA27D92E8b30b2C58ed07f9E20001",
+            "nonce": "77335919759354908795179317946135673084898666177884518561616512228820284572204",
+            "deadline": "1893456000",
+            "witness": {
+              "to": "0x7AFAe22f41203EDF98213e0F14cC181F01D27b6d",
+              "validAfter": "0"
+            }
+          }
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "invalid_permit2_signature"
+      }
+    },
+    {
+      "id": "request-path-changed",
+      "description": "Intermediary changes the request path.",
+      "wire": {
+        "payload": {
+          "signature": "0x371cfd7897627d70fb3169ecc7355ad25db1d8305ee9ec5e0de44a6e0087c4fa2de6d303ae8add937cb56304b71de9e91bcc492750edc8952b12d16dfbf836d71b",
+          "permit2Authorization": {
+            "permitted": {
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "amount": "10000"
+            },
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "spender": "0x402085c248EeA27D92E8b30b2C58ed07f9E20001",
+            "nonce": "77335919759354908795179317946135673084898666177884518561616512228820284572204",
+            "deadline": "1893456000",
+            "witness": {
+              "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+              "validAfter": "0"
+            }
+          }
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/admin?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    },
+    {
+      "id": "nonce-unrelated-to-commitment",
+      "description": "Client signs a random Permit2 nonce, as an x402 client without this extension does.",
+      "wire": {
+        "payload": {
+          "signature": "0x55624d06e374976efe123e1aaaf4c249befadd0bbd0ea57f76fb7b3cf17a2976708f4244cd5765c2a4dfae9fab70fd9a5e475dc0c8706db6af36750a98143ad31c",
+          "permit2Authorization": {
+            "permitted": {
+              "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+              "amount": "10000"
+            },
+            "from": "0x8ec382eb4a7a35208A731e15378ac0d57BD89D71",
+            "spender": "0x402085c248EeA27D92E8b30b2C58ed07f9E20001",
+            "nonce": "45464984113844003764780361296570211612934971240015538712840118606803849293058",
+            "deadline": "1893456000",
+            "witness": {
+              "to": "0x35FF5b856745E9c75C1E33BC1f4B46Af26851C9E",
+              "validAfter": "0"
+            }
+          }
+        },
+        "extension": {
+          "version": 1,
+          "keyId": "0xc6dbedfc311a62ccdef46ffbdb35562c048b6ce4e6201924dfe884b05abec27a",
+          "ephemeralPublicKey": "0x03abb7f8a5d251b164b4ee722203bb634c7a1c0385cf28081af91b0e2bb309f7f9",
+          "nonceSalt": "0xcf164fd78f236e1293057c5157dd092d1a9c8cd3951a84c74f9a8ec8100ca5b2"
+        },
+        "request": {
+          "method": "POST",
+          "url": "https://api.seller.example/v1/report?id=42",
+          "body": "{\"query\":\"weather\",\"city\":\"Seoul\"}"
+        }
+      },
+      "expect": {
+        "stage": "seller",
+        "reason": "response_encryption_nonce_mismatch"
+      }
+    }
+  ]
+}

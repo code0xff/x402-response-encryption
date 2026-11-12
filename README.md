@@ -29,6 +29,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python -I verify_cases.py                # 37 tampering cases, each rejected at the expected check
 .venv/bin/python -I canonical_url.py url-cases.json  # 35 URL canonicalization cases
 .venv/bin/python -I validate_schemas.py            # messages against schemas/
+.venv/bin/python -I verify_profiles.py             # Permit2 and SVM profile vectors and their tampering cases
 ```
 
 The TypeScript packages run the same vectors, plus end-to-end tests with the real `@x402/express` middleware and an in-process facilitator: one with the seller behind a logging reverse proxy, one with a payment gateway that issues the 402 and relays to the origin:
@@ -59,6 +60,7 @@ cd test-vectors
 npm install
 npm run generate      # vector-1.json, negative-cases.json, did-document.json
 npm run generate:urls # url-cases.json
+npm run generate:profiles  # vector-permit2.json, vector-svm.json
 ```
 
 `vector-1.json` is deterministic. All private keys in it are test-only values derived from fixed labels.
