@@ -2,7 +2,7 @@
 
 - Date: 2026-11-07
 - Status: design draft
-- Initial scope: EVM sellers and clients using `exact` payments with EIP-3009. The binding is defined independently of the payment scheme (3.1); Permit2 and Solana profiles are sketched (3.5)
+- Initial scope: EVM sellers and clients using `exact` payments with EIP-3009. The binding is defined independently of the payment scheme (3.1); Permit2 and Solana profiles are defined but not implemented (3.5)
 - Purpose: design review, proof of concept, preparation of an x402 extension proposal
 
 > The extension name `response-encryption`, the DID document extension property and fragment rules, and all example fields are proposals. None of this has been adopted into the x402 specification.
@@ -183,18 +183,22 @@ URLs with the same canonical form share a `requestHash`, so a covered resource m
 
 ### 3.5 Scheme profiles
 
-A profile for another payment scheme fixes four things:
+A profile for a payment scheme fixes:
 
-- where `c` sits in the signed payload, and how the seller reads it back after the facilitator has verified the signature;
-- the digest used as HKDF salt (6.1) in place of the EIP-712 authorization digest;
-- the identifier that keys envelope retention and the per-payment lock (8.1);
-- which existing error code reports a signature that no longer covers the presented `c`.
+- **Extraction:** the client-chosen field, covered by the payment signature, that carries `c`, and a rule that yields exactly one 32-byte value from the payload or rejects it. The rule must not depend on the extension fields, since those are not signed.
+- **Digest:** `authorizationDigest`, the digest of what the client signed, used as HKDF salt (6.1) and compared on retries (8.1).
+- **Local signature check:** how the seller verifies the client's signature over that digest without the facilitator, which the retry path needs (8.1).
+- **Attestation:** for schemes whose payee is not an EVM address, how `payTo` signs the key attestation (4.1).
 
-The two sketches below are not normative and are not implemented.
+"The signed commitment" below means the value the extraction rule yields. The seller compares the `c` it recomputes with it (`response_encryption_nonce_mismatch` on difference, a name kept from the EIP-3009 profile), and envelope retention and the per-payment lock (8.1) are keyed by it in every profile. `c` includes the 32-byte random `r`, so it is unique without relying on the scheme's own replay key.
 
-**Permit2.** The Permit2 nonce is a bitmap position for unordered replay protection, so it cannot carry `c`. The place for it is the witness of `permitWitnessTransferFrom`, which exists to let a signature cover extra application data. The witness type used by x402's Permit2 path is fixed by its proxy contract, so this profile needs a witness type with a `bytes32` field for `c`, agreed with that contract. The HKDF salt is the EIP-712 digest of the permit with its witness.
+**EIP-3009** (normative, implemented, 3.1). The signed commitment is `authorization.nonce`. `authorizationDigest` is the EIP-712 digest of `TransferWithAuthorization` under the token's domain, and the local check recovers `from` from the signature (EIP-1271 for contract wallets).
 
-**Solana (`exact` on SVM).** The client signs a transaction rather than a typed message. The profile adds a Memo program instruction whose data is `c` in hex; the transaction signature covers it, and the seller reads it from the verified transaction. Facilitators that restrict the allowed instructions must accept this memo. The HKDF salt is the hash of the transaction message. Solana clients would likely pair this with an X25519 suite (6.4).
+The two profiles below follow from the x402 `exact` specifications for [EVM][x402-exact-evm] and [SVM][x402-exact-svm]. They are not implemented and have no test vectors yet.
+
+**Permit2** (`exact` on EVM, `assetTransferMethod: "permit2"`). `c` is `permit2Authorization.nonce`, read as a big-endian `uint256` (the payload carries it as a decimal string). Permit2 accepts any `uint256` as a signature-transfer nonce: it splits the value into a 248-bit word index and an 8-bit bit index of a per-owner bitmap, so distinct values never collide [Permit2][permit2-sig]. x402's Go client already fills this field with 32 random bytes. The witness is not an option: x402's `x402ExactPermit2Proxy` fixes it as `Witness(address to,uint256 validAfter)`. `authorizationDigest` is the EIP-712 digest of `PermitWitnessTransferFrom`, witness included, under the Permit2 domain. The local check recovers `permit2Authorization.from` from that digest, or validates it with EIP-1271 when `from` is a contract, as Permit2 itself does. An invalid signature surfaces as `invalid_permit2_signature`. The attestation is unchanged, since `payTo` is an EVM address.
+
+**Solana** (`exact` on SVM). The client already signs a transaction that must contain an SPL Memo instruction after the `TransferChecked`, holding either `extra.memo` or a random nonce of at least 16 bytes, hex-encoded. In this profile the transaction must contain exactly one top-level SPL Memo instruction, and its data must be exactly 64 lowercase hex characters, the encoding of `c`. The seller rejects a transaction with no such memo or with more than one Memo instruction before execution or settlement. Without this rule a payer could sign one transaction carrying two commitments and present it for two requests. The client's transaction signature covers the whole message, so an intermediary cannot change or add a memo. The SVM spec places the memo after `TransferChecked` in its static layout for standard wallets; this profile requires the memo at the top level also for smart wallets whose transfer happens through CPI. The local check verifies the client's ed25519 signature over the serialized message; it does not need an unexpired blockhash. When `extra.memo` is present the facilitator requires exactly one memo equal to it, which leaves no room for `c`, so a seller must not set `extra.memo` on a covered resource. `authorizationDigest` is SHA-256 of the serialized transaction message the client signed. Two pieces are new work: `payTo` is an ed25519 address and cannot produce the EIP-712 attestation of 4.1, so the profile needs an attestation signed by `payTo` with ed25519 over the same fields. That limits it to a `payTo` controlled by an ed25519 keypair; a program-derived address has no private key, and a seller paid to one needs a delegation mechanism this proposal does not define; and the seller's check of `c` must run after the facilitator's verification, which also validates the client signature. The ephemeral key is generated by the client library, not the wallet, so the secp256k1 suite (6.4) still works; an X25519 suite would only be a convenience.
 
 ## 4. Seller key binding
 
@@ -373,7 +377,7 @@ sequenceDiagram
 ```text
 Z    = x-coordinate( e·M ) = x-coordinate( m·E )      // 32 bytes, big-endian
 
-salt = authorizationDigest                            // EIP-712 signTypedData digest, 32 bytes
+salt = authorizationDigest                            // digest the client signed, fixed by the profile (3.5), 32 bytes
 
 info = "x402-response-encryption/v1/response"
        ‖ E                                            // 33 bytes
@@ -504,7 +508,7 @@ Codes follow the x402 convention of snake_case reasons, all prefixed `response_e
 | `response_encryption_unknown_key_id` | `keyId` not held by the server (rotated out, or never issued) | 4.1 |
 | `response_encryption_invalid_ephemeral_key` | `ephemeralPublicKey` not a valid compressed secp256k1 point | 6.1 |
 | `response_encryption_invalid_url` | The server cannot canonicalize the URL it received (3.3) | 3.3 |
-| `response_encryption_nonce_mismatch` | Recomputed nonce differs from `authorization.nonce` | 3.1 |
+| `response_encryption_nonce_mismatch` | Recomputed `c` differs from the signed commitment (`authorization.nonce` in EIP-3009) | 3.1, 3.5 |
 
 An invalid payment signature is reported with the existing scheme code (`invalid_exact_evm_payload_signature` for EIP-3009 `exact`). The nonce check runs only after the signature check passes, so a nonce rewritten to match a swapped key surfaces as a signature error (A.6).
 
@@ -552,11 +556,11 @@ If the response is lost after settlement (a dropped connection, an intermediary 
 
 **Seller**
 
-- After settlement succeeds, store the envelope keyed by the authorization `nonce`, together with the authorization digest (6.1), for a retention period. 24 hours is the recommended minimum.
-- On a paid request, look up the nonce before contacting the facilitator. If an envelope is stored, require the presented authorization to have the stored digest, verify the payment signature and recompute the nonce (3.1) as usual, then return the stored envelope byte for byte. The nonce alone is not enough: its inputs are public, so anyone can sign a different authorization with the same nonce. Do not call the facilitator, settle, or run the request again.
+- After settlement succeeds, store the envelope keyed by the signed commitment (3.5), the authorization `nonce` in the EIP-3009 profile, together with the authorization digest (6.1), for a retention period. 24 hours is the recommended minimum.
+- On a paid request, look up the signed commitment before contacting the facilitator. If an envelope is stored, require the presented authorization to have the stored digest, verify the client's signature locally as the profile defines (3.5) and recompute `c` (3.1) as usual, then return the stored envelope byte for byte. The commitment alone is not enough: its inputs are public, so anyone can sign a different authorization carrying the same value. Do not call the facilitator, settle, or run the request again.
 - The `keyId` check and the authorization's validity window are skipped for a stored envelope: the key may have been rotated out since settlement (4.4), and the window may have closed while the client was retrying. The stored envelope does not need the private key.
-- Serialize processing per nonce, taking the lock before the lookup and holding it until the envelope is stored, so a duplicate that arrives while the first request is still running waits for it instead of running the request twice. Sellers with several workers need a shared lock. The token contract already rejects a second settlement of the same nonce; the lock prevents double execution.
-- The nonce recomputation is what stops a replayed payload from being used for a different request: changing the method, URL or body changes `requestHash`, and the request is rejected with `response_encryption_nonce_mismatch` instead of receiving the stored envelope.
+- Serialize processing per signed commitment, taking the lock before the lookup and holding it until the envelope is stored, so a duplicate that arrives while the first request is still running waits for it instead of running the request twice. Sellers with several workers need a shared lock. The scheme's own replay protection stops a second settlement (in EIP-3009 the token contract rejects a used nonce); the lock prevents double execution.
+- Recomputing `c` is what stops a replayed payload from being used for a different request: changing the method, URL or body changes `requestHash`, and the request is rejected with `response_encryption_nonce_mismatch` instead of receiving the stored envelope.
 
 Returning a stored envelope to whoever presents the payload discloses nothing new. It is ciphertext that already passed through every intermediary on the first attempt, and only the holder of `e` can decrypt it.
 
@@ -646,7 +650,7 @@ On Base Sepolia the demo settled a real payment through an in-process facilitato
 3. **Key operations**: done (4.4). Recommended values (10-minute grace, 90-day rotation) need checking against real `maxTimeoutSeconds` settings.
 4. **did:web profile and marketplace domains**: the profile matches the DID against the URL the client requested (4.5), so a seller served under a marketplace or API-gateway domain fails the check. Proposed fix: an `origins` list in the DID document's `x402ResponseEncryption` property naming the origins the seller authorizes. Deferred until the core extension gets feedback.
 5. **Extension schema and error codes**: done (7.4, `schemas/`). Codes still need review against x402 naming once maintainers comment.
-6. **Scheme profiles**: the binding is scheme-independent (3.1) and Permit2 (witness) and Solana (memo) profiles are sketched (3.5). Remaining: agreeing a witness type with x402's Permit2 proxy contract, confirming that SVM facilitators accept a memo instruction, and test vectors for both.
+6. **Scheme profiles**: the binding is scheme-independent (3.1), with Permit2 (nonce) and Solana (memo) profiles defined in 3.5. Remaining: implementations and test vectors for both, and an ed25519 attestation format for Solana `payTo`.
 7. **Retries and settlement**: done (8.1). The 24-hour retention minimum is a starting point for discussion.
 8. **Request body encryption (follow-up extension)**: this proposal leaves requests in plaintext. A follow-up could encrypt the request body to the seller key with the same ECDH construction. It needs four things:
    - **Key before the first request.** The unpaid request that triggers the 402 is sent before the client sees any key. The client would get the key ahead of time, for example from the did:web document (4.5) or a key cached from an earlier exchange.
@@ -836,6 +840,9 @@ Schemas check format only. Every cryptographic and cross-field check stays in th
 - [x402 Protocol Specification v2][x402-spec]
 - [x402 HTTP Transport][x402-http]
 - [x402 Offer & Receipt extension][x402-offer-receipt]
+- [x402 `exact` scheme on EVM][x402-exact-evm]
+- [x402 `exact` scheme on SVM][x402-exact-svm]
+- [Permit2 SignatureTransfer][permit2-sig]
 - [EIP-3009: Transfer With Authorization][eip3009]
 - [EIP-712: Typed structured data hashing and signing][eip712]
 - [EIP-1271: Standard Signature Validation Method for Contracts][eip1271]
@@ -851,6 +858,9 @@ Schemas check format only. Every cryptographic and cross-field check stays in th
 [x402-spec]: https://github.com/x402-foundation/x402/blob/main/specs/x402-specification-v2.md
 [x402-http]: https://github.com/x402-foundation/x402/blob/main/specs/transports-v2/http.md
 [x402-offer-receipt]: https://github.com/x402-foundation/x402/blob/main/specs/extensions/extension-offer-and-receipt.md
+[x402-exact-evm]: https://github.com/x402-foundation/x402/blob/main/specs/schemes/exact/scheme_exact_evm.md
+[x402-exact-svm]: https://github.com/x402-foundation/x402/blob/main/specs/schemes/exact/scheme_exact_svm.md
+[permit2-sig]: https://github.com/Uniswap/permit2/blob/main/src/SignatureTransfer.sol
 [eip3009]: https://eips.ethereum.org/EIPS/eip-3009
 [eip712]: https://eips.ethereum.org/EIPS/eip-712
 [eip1271]: https://eips.ethereum.org/EIPS/eip-1271
