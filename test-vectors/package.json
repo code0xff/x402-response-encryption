@@ -4,11 +4,18 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "generate": "node generate.mjs"
+    "generate": "tsx generate.ts",
+    "generate:urls": "tsx url-cases.ts",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@noble/curves": "1.4.0",
     "@noble/hashes": "1.4.0",
     "viem": "2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "tsx": "4.19.2",
+    "typescript": "5.6.3"
   }
 }

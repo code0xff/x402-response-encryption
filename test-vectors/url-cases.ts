@@ -1,7 +1,7 @@
 import { writeFileSync } from 'node:fs';
-import { canonicalUrl, UrlError } from './canonical-url.mjs';
+import { canonicalUrl, UrlError } from './canonical-url.js';
 
-const inputs = [
+const inputs: [string, string][] = [
   ['already canonical', 'https://api.seller.example/v1/report?id=42'],
   ['scheme and host case', 'HTTPS://API.Seller.Example/v1/report'],
   ['default https port', 'https://api.seller.example:443/v1/report'],

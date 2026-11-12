@@ -58,7 +58,7 @@ To regenerate the vectors (requires Node.js 20 or later):
 cd test-vectors
 npm install
 npm run generate      # vector-1.json, negative-cases.json, did-document.json
-node url-cases.mjs    # url-cases.json
+npm run generate:urls # url-cases.json
 ```
 
 `vector-1.json` is deterministic. All private keys in it are test-only values derived from fixed labels.

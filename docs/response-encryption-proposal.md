@@ -805,7 +805,7 @@ Two acceptance criteria from 10.2 (settlement failure, intermediary logs and cac
 
 ### A.7 URL canonicalization
 
-`test-vectors/url-cases.json` holds 35 inputs with expected results for the rules in 3.3: 27 canonical forms and 8 rejections. TypeScript (`canonical-url.mjs`) and Python (`canonical_url.py`) implement the rules separately, and neither uses a WHATWG URL parser.
+`test-vectors/url-cases.json` holds 35 inputs with expected results for the rules in 3.3: 27 canonical forms and 8 rejections. TypeScript (`canonical-url.ts`) and Python (`canonical_url.py`) implement the rules separately, and neither uses a WHATWG URL parser.
 
 | Input | Result |
 | --- | --- |

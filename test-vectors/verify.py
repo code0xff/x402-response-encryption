@@ -1,6 +1,6 @@
 """Independent Python check of vector-1.json.
 
-Shares no code with generate.mjs. secp256k1 arithmetic, EIP-712 encoding and
+Shares no code with generate.ts. secp256k1 arithmetic, EIP-712 encoding and
 signature recovery are written here from the specs; only keccak256 (pycryptodome)
 and HKDF / AES-GCM (cryptography) come from libraries.
 """

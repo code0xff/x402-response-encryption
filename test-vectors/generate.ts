@@ -6,18 +6,18 @@ import { secp256k1 } from '@noble/curves/secp256k1';
 import { keccak_256 } from '@noble/hashes/sha3';
 import { hashTypedData, recoverTypedDataAddress } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { canonicalUrl } from './canonical-url.mjs';
+import { canonicalUrl } from './canonical-url.js';
 
 const enc = new TextEncoder();
-const hex = (u8) => '0x' + Buffer.from(u8).toString('hex');
-const unhex = (h) => Uint8Array.from(Buffer.from(h.replace(/^0x/, ''), 'hex'));
-const cat = (...parts) => Uint8Array.from(Buffer.concat(parts.map((p) => Buffer.from(p))));
-const u32 = (n) => { const b = Buffer.alloc(4); b.writeUInt32BE(n); return b; };
-const u16 = (n) => { const b = Buffer.alloc(2); b.writeUInt16BE(n); return b; };
-const lp = (s) => { const b = enc.encode(s); return cat(u32(b.length), b); };
-const sha256 = (b) => Uint8Array.from(createHash('sha256').update(b).digest());
-const b64url = (b) => Buffer.from(b).toString('base64url');
-const fixed = (label) => sha256(enc.encode('x402-response-encryption/test-vector/' + label));
+const hex = (u8: Uint8Array): `0x${string}` => `0x${Buffer.from(u8).toString('hex')}`;
+const unhex = (h: string) => Uint8Array.from(Buffer.from(h.replace(/^0x/, ''), 'hex'));
+const cat = (...parts: (Uint8Array | number[])[]) => Uint8Array.from(Buffer.concat(parts.map((p) => Buffer.from(p))));
+const u32 = (n: number) => { const b = Buffer.alloc(4); b.writeUInt32BE(n); return b; };
+const u16 = (n: number) => { const b = Buffer.alloc(2); b.writeUInt16BE(n); return b; };
+const lp = (s: string) => { const b = enc.encode(s); return cat(u32(b.length), b); };
+const sha256 = (b: Uint8Array) => Uint8Array.from(createHash('sha256').update(b).digest());
+const b64url = (b: Uint8Array) => Buffer.from(b).toString('base64url');
+const fixed = (label: string) => sha256(enc.encode('x402-response-encryption/test-vector/' + label));
 
 const TAG = {
   nonce: enc.encode('x402-response-encryption/v1/nonce'),
@@ -35,7 +35,7 @@ const tokenDomain = {
   name: 'USD Coin',
   version: '2',
   chainId,
-  verifyingContract: '0x000000000000000000000000000000000000dEaD',
+  verifyingContract: '0x000000000000000000000000000000000000dEaD' as const,
 };
 
 const payerKey = fixed('payer-wallet');
@@ -85,7 +85,7 @@ const attestationTyped = {
       { name: 'notAfter', type: 'uint64' },
     ],
   },
-  primaryType: 'EncryptionKeyAttestation',
+  primaryType: 'EncryptionKeyAttestation' as const,
   message: {
     payTo: payTo.address,
     keyId: hex(keyId),
@@ -110,7 +110,7 @@ const authorizationTyped = {
       { name: 'nonce', type: 'bytes32' },
     ],
   },
-  primaryType: 'TransferWithAuthorization',
+  primaryType: 'TransferWithAuthorization' as const,
   message: {
     from: payer.address,
     to: payTo.address,
@@ -150,7 +150,7 @@ const envelope = {
 };
 
 // ---- self checks ----
-const eq = (a, b) => Buffer.from(a).equals(Buffer.from(b));
+const eq = (a: Uint8Array, b: Uint8Array) => Buffer.from(a).equals(Buffer.from(b));
 const checks = {
   ecdhSymmetric: eq(Zclient, Zseller),
   ecdhMatchesNodeCrypto: eq(Zclient, Znode),
@@ -219,12 +219,12 @@ console.log(json);
 //   client-402 (before paying) -> seller (before settling) -> client-response.
 // did:web DID document (proposal 4.3), as the client fetches it directly from the seller origin.
 const did = 'did:web:api.seller.example';
-const jwkOf = (pub) => {
+const jwkOf = (pub: Uint8Array) => {
   const p = secp256k1.ProjectivePoint.fromHex(pub).toAffine();
-  const b = (n) => Buffer.from(n.toString(16).padStart(64, '0'), 'hex').toString('base64url');
+  const b = (n: bigint) => Buffer.from(n.toString(16).padStart(64, '0'), 'hex').toString('base64url');
   return { kty: 'EC', crv: 'secp256k1', x: b(p.x), y: b(p.y) };
 };
-const encKid = (id) => `${did}#x402-re-${Buffer.from(id).toString('hex')}`;
+const encKid = (id: Uint8Array) => `${did}#x402-re-${Buffer.from(id).toString('hex')}`;
 const didDocument = {
   '@context': ['https://www.w3.org/ns/did/v1', 'https://w3id.org/security/suites/jws-2020/v1'],
   id: did,
@@ -247,7 +247,7 @@ const didDocument = {
 };
 writeFileSync(new URL('./did-document.json', import.meta.url), JSON.stringify(didDocument, null, 2) + '\n');
 
-const str = (o) => JSON.parse(JSON.stringify(o, (_, v) => (typeof v === 'bigint' ? v.toString() : v)));
+const str = (o: unknown): any => JSON.parse(JSON.stringify(o, (_, v) => (typeof v === 'bigint' ? v.toString() : v)));
 const baseWire = str({
   // The x402 PaymentRequirements field the client signs over as authorization.to.
   paymentRequirements: { payTo: payTo.address },
@@ -289,7 +289,7 @@ const baseClient = str({
   didDocument,
   now: 1800000000,
 });
-const baseSeller = { encryptionPrivateKey: hex(m), keyIds: [hex(keyId)] };
+const baseSeller: any = { encryptionPrivateKey: hex(m), keyIds: [hex(keyId)] };
 
 // A successor key for the rotation cases (proposal 4.5).
 const rotatedKeyId = keccak_256(cat(TAG.keyId, secp256k1.getPublicKey(fixed('rotated-seller-encryption'), true)));
@@ -304,7 +304,7 @@ const attackerAttestation = await attackerPayTo.signTypedData({
 });
 // Intermediary alters resource.url in the 402; the client honestly signs over the altered URL.
 const tamperedResource = 'https://api.seller.example/v1/report?id=43';
-const reqHashOf = (req) => sha256(cat(TAG.request, lp(req.method), lp(canonicalUrl(req.url)), sha256(enc.encode(req.body))));
+const reqHashOf = (req: typeof request) => sha256(cat(TAG.request, lp(req.method), lp(canonicalUrl(req.url)), sha256(enc.encode(req.body))));
 const tamperedAuth = {
   ...authorizationTyped.message,
   nonce: hex(keccak_256(cat(TAG.nonce, E, keyId, reqHashOf({ ...request, url: tamperedResource }), r))),
@@ -318,13 +318,14 @@ const attackerAttestationRealKey = await attackerPayTo.signTypedData({
 });
 
 // Seller envelope store (proposal 8.1), keyed by authorization nonce.
-const storedFor = (w) => ({ [w.paymentPayload.authorization.nonce.toLowerCase()]: w.envelope });
+const storedFor = (w: any) => ({ [w.paymentPayload.authorization.nonce.toLowerCase()]: w.envelope });
 
-const flip = (b64) => { const b = Buffer.from(b64, 'base64url'); b[0] ^= 1; return b.toString('base64url'); };
+const flip = (b64: string) => { const b = Buffer.from(b64, 'base64url'); b[0] = b[0]! ^ 1; return b.toString('base64url'); };
 
 const DID_CASES = new Set(['402-full-swap', 'did-jwk-swapped', '402-full-swap-own-did', '402-payto-redirected', 'did-key-revoked', 'valid-did-web']);
 
-const cases = [
+type Mutate = (wire: any, client: any, seller: any) => void;
+const caseList: [string, string, Mutate, [string, string | null] | null][] = [
   ['valid', 'No tampering.', () => {}, null],
   ['valid-did-web', 'No tampering, client also checks the did:web DID document.', () => {}, null],
   ['402-full-swap-core', 'Core profile: intermediary replaces payTo, key and attestation with its own valid set. The client cannot tell; the payment goes to the substituted payTo on-chain.',
@@ -429,7 +430,8 @@ const cases = [
     (w) => { w.envelope.contentType = 'text/plain'; }, ['client-response', 'response_encryption_decrypt_failed']],
   ['wrong-ephemeral-private-key', 'Client decrypts with a different ephemeral private key.',
     (_, c) => { c.ephemeralPrivateKey = hex(fixed('attacker-ephemeral')); }, ['client-response', 'response_encryption_decrypt_failed']],
-].map(([id, description, mutate, expect]) => {
+];
+const cases = caseList.map(([id, description, mutate, expect]) => {
   const wire = structuredClone(baseWire);
   const client = structuredClone(baseClient);
   const mer = structuredClone(baseSeller);
