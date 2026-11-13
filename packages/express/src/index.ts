@@ -62,6 +62,8 @@ export interface StoredResponse {
   envelope: Envelope;
   /** authorizationDigest (EIP-712 digest) of the payment that produced the envelope; a retry must present the same one (proposal 8.1). */
   authorizationDigest: Hex;
+  /** Address that signed it. Permit2 digests do not cover the owner, so a retry must also come from this signer. */
+  payer: Address;
   /** Present when this process settled the payment (deployment A). */
   settlement?: SettleResponse;
 }
@@ -256,6 +258,9 @@ function nonceLocks() {
   };
 }
 
+/** True once the response can no longer be delivered; read the state, since a 'close' event may already be past. */
+const connectionClosed = (res: Response) => res.destroyed || res.closed || !!res.socket?.destroyed;
+
 function paymentFromRequest(req: Request): PaymentPayload | undefined {
   const header = req.header('payment-signature');
   if (!header) return undefined;
@@ -281,7 +286,6 @@ const viewWith = (p: PaymentLike, tokenDomain: TokenDomain | undefined): Payment
 const viewOf = (p: PaymentLike): PaymentView | undefined =>
   viewWith(p, domainOf(p.accepted.network, p.accepted.asset, p.accepted.extra as { name?: string; version?: string }));
 
-const commitmentOf = (p: PaymentLike) => viewOf(p)?.commitment ?? '';
 
 /** State and steps shared by both deployments. */
 function sellerCore(opts: CommonOptions & { resourceUrl: ResourceUrlOf }) {
@@ -336,10 +340,11 @@ function sellerCore(opts: CommonOptions & { resourceUrl: ResourceUrlOf }) {
   };
 
   /** Buffers the handler's output and replaces a 2xx body with its envelope. Never falls back to plaintext (proposal 8). */
-  const sealOnEnd = (res: Response, payment: PaymentPayload, digest: Uint8Array, bound: BoundRequest, onSealed: (e: Envelope) => void) => {
+  const sealOnEnd = (res: Response, payment: PaymentPayload, digest: Uint8Array, bound: BoundRequest, onSealed: (e: Envelope) => boolean) => {
     const chunks: Buffer[] = [];
     const write = res.write.bind(res);
     const end = res.end.bind(res);
+    const writeHead = res.writeHead;
     const toBuffer = (c: unknown, enc?: unknown) =>
       Buffer.isBuffer(c) ? c : typeof c === 'string' ? Buffer.from(c, (enc as BufferEncoding) ?? 'utf8') : Buffer.from(c as Uint8Array);
 
@@ -350,13 +355,30 @@ function sellerCore(opts: CommonOptions & { resourceUrl: ResourceUrlOf }) {
       return true;
     }) as Response['write'];
 
+    // Hold the handler's status and headers on `res` so the check below sees them; nothing is written
+    // until the envelope (or an error) is sent.
+    res.writeHead = ((status: number, reason?: unknown, headers?: unknown) => {
+      res.statusCode = status;
+      const h = (typeof reason === 'object' ? reason : headers) as Record<string, string | number | string[]> | undefined;
+      if (h && !Array.isArray(h)) for (const [k, v] of Object.entries(h)) res.setHeader(k, v);
+      return res;
+    }) as Response['writeHead'];
+
     res.end = ((chunk?: unknown, encoding?: unknown) => {
       if (chunk && typeof chunk !== 'function') chunks.push(toBuffer(chunk, typeof encoding === 'string' ? encoding : undefined));
       res.write = write;
       res.end = end;
+      res.writeHead = writeHead;
       const status = res.statusCode;
       // Not a paid success: x402 does not settle for >= 400, and the body is not a resource body.
-      if (status < 200 || status > 299) return end(Buffer.concat(chunks));
+      if (status >= 400) return end(Buffer.concat(chunks));
+      // 1xx and 3xx would settle (x402 cancels only at >= 400) with no envelope to return; refuse them.
+      if (status < 200 || status > 299) {
+        res.status(500).type('application/json');
+        res.removeHeader('content-length');
+        res.removeHeader('location');
+        return end(JSON.stringify({ error: 'a paid response must have a 2xx status to be encrypted' }));
+      }
       let envelope: Envelope;
       try {
         const contentType = String(res.getHeader('content-type') ?? 'application/octet-stream');
@@ -366,7 +388,12 @@ function sellerCore(opts: CommonOptions & { resourceUrl: ResourceUrlOf }) {
         res.removeHeader('content-length');
         return end(JSON.stringify({ errorReason: 'response_encryption_encryption_failed' }));
       }
-      onSealed(envelope);
+      if (!onSealed(envelope)) {
+        // The caller can no longer keep this envelope for retries; a 409 stops x402 from settling.
+        res.status(409).type('application/json');
+        res.removeHeader('content-length');
+        return end(JSON.stringify({ error: 'paid request superseded; resend the same payment payload' }));
+      }
       // The resource status travels in the envelope; the wire status is always 200 so a 204 still has a body (proposal 7.3).
       res.statusCode = 200;
       const body = JSON.stringify(envelope);
@@ -386,9 +413,25 @@ export function createResponseEncryption(opts: ResponseEncryptionOptions) {
   // Envelopes produced but not yet settled, and per-nonce locks (proposal 8.1).
   const pending = new Map<string, StoredResponse>();
   const locks = nonceLocks();
-  const release = (nonce: string) => {
-    pending.delete(nonce);
-    locks.release(nonce);
+  // The request that holds each commitment's lock. Pending state and hooks act only for that request:
+  // other requests can carry the same commitment (under Permit2 another owner can sign it, with or
+  // without the extension), and their settlement or cancellation must not touch the holder's state.
+  const holders = new Map<string, { req: Request; unlock: () => void }>();
+  const holds = (c: string, req: Request | undefined) => !!req && holders.get(c)?.req === req;
+  const release = (c: string, req: Request | undefined) => {
+    const h = holders.get(c);
+    if (!h || !req || h.req !== req) return;
+    holders.delete(c);
+    pending.delete(c);
+    h.unlock();
+  };
+  // @x402/express passes its HTTP context to hooks; its adapter keeps the Express request.
+  const requestOf = (ctx: { transportContext?: unknown }) =>
+    (ctx.transportContext as { request?: { adapter?: { req?: Request } } } | undefined)?.request?.adapter?.req;
+  const hookTarget = (ctx: { paymentPayload: PaymentLike; transportContext?: unknown }) => {
+    const c = viewOf(ctx.paymentPayload)?.commitment;
+    const req = requestOf(ctx);
+    return c && holds(c, req) ? { c, req } : undefined;
   };
 
   /** Register on x402ResourceServer. */
@@ -396,16 +439,23 @@ export function createResponseEncryption(opts: ResponseEncryptionOptions) {
     ...responseEncryptionExtension(m.info),
     hooks: {
       onAfterSettle: async (_decl, ctx) => {
-        const c = commitmentOf(ctx.paymentPayload);
-        const sealed = pending.get(c);
+        const t = hookTarget(ctx);
+        if (!t) return;
+        const sealed = pending.get(t.c);
         try {
-          if (sealed && ctx.result.success) await m.store.set(c, { ...sealed, settlement: ctx.result as SettleResponse }, m.retention);
+          if (sealed && ctx.result.success) await m.store.set(t.c, { ...sealed, settlement: ctx.result as SettleResponse }, m.retention);
         } finally {
-          release(c);
+          release(t.c, t.req);
         }
       },
-      onSettleFailure: async (_decl, ctx) => release(commitmentOf(ctx.paymentPayload)),
-      onVerifiedPaymentCanceled: async (_decl, ctx) => release(commitmentOf(ctx.paymentPayload)),
+      onSettleFailure: async (_decl, ctx) => {
+        const t = hookTarget(ctx);
+        if (t) release(t.c, t.req);
+      },
+      onVerifiedPaymentCanceled: async (_decl, ctx) => {
+        const t = hookTarget(ctx);
+        if (t) release(t.c, t.req);
+      },
     },
   };
 
@@ -430,13 +480,28 @@ export function createResponseEncryption(opts: ResponseEncryptionOptions) {
       if (stored) {
         unlock();
         // Retry of a settled payment: the same signed authorization and binding, then the stored bytes (proposal 8.1).
-        // Anything else goes to x402, whose facilitator rejects the used nonce.
-        if (toHex(view.digest) !== stored.authorizationDigest || !(await view.signerMatches())) return next();
+        // Anything else is refused, not passed to x402: under Permit2 another owner's signature over the
+        // same commitment is a valid new payment, and settling it would replace the payer's stored envelope.
+        if (toHex(view.digest) !== stored.authorizationDigest || view.from !== stored.payer || !(await view.signerMatches())) {
+          return void res.status(402).json({ errorReason: 'invalid_payment_authorization' });
+        }
         if (m.bind(req, res, payment, view, true)) m.sendStored(res, stored);
         return;
       }
-      // Requests that never reach settlement must not hold the lock.
-      res.on('close', () => setTimeout(() => (pending.has(nonce) ? undefined : unlock()), 0));
+      // Release when x402 ends the response (after settlement and its hooks), or when the connection
+      // closes with no envelope awaiting settlement (a request that never ends its response must not
+      // hold the lock). An early release is safe: once another request holds the commitment, this
+      // request's hooks and pending writes are ignored.
+      // The connection may have closed while this request waited; its close event is then already past.
+      if (connectionClosed(res)) return void unlock();
+      holders.set(nonce, { req, unlock });
+      const end = res.end.bind(res) as (...a: unknown[]) => Response;
+      res.end = ((...args: unknown[]) => {
+        const out = end(...args);
+        setTimeout(() => release(nonce, req), 0);
+        return out;
+      }) as Response['end'];
+      res.on('close', () => setTimeout(() => (holds(nonce, req) && pending.has(nonce) ? undefined : release(nonce, req)), 0));
       next();
     } catch (err) {
       next(err);
@@ -458,8 +523,14 @@ export function createResponseEncryption(opts: ResponseEncryptionOptions) {
       return next(err);
     }
     if (!bound || !view) return;
-    const { commitment, digest } = view;
-    m.sealOnEnd(res, payment, digest, bound, (envelope) => pending.set(commitment, { envelope, authorizationDigest: toHex(digest) }));
+    const { commitment, digest, from } = view;
+    m.sealOnEnd(res, payment, digest, bound, (envelope) => {
+      // A request that lost the lock (its connection closed mid-handler) must not settle: its
+      // envelope could not be kept for the retry the payer will send.
+      if (!holds(commitment, req)) return false;
+      pending.set(commitment, { envelope, authorizationDigest: toHex(digest), payer: from });
+      return true;
+    });
     next();
   };
 
@@ -533,7 +604,7 @@ export function createOriginEncryption(opts: OriginEncryptionOptions): RequestHa
         const stored = await m.store.get(nonce);
         if (stored) {
           // Retry: the same signed authorization gets the same bytes, even after validBefore (proposal 8.1).
-          if (stored.authorizationDigest !== digest) return refuse(res, 'invalid_payment_authorization');
+          if (stored.authorizationDigest !== digest || stored.payer !== view.from) return refuse(res, 'invalid_payment_authorization');
           if (m.bind(req, res, payment, view, true)) m.sendStored(res, stored);
           return;
         }
@@ -543,15 +614,25 @@ export function createOriginEncryption(opts: OriginEncryptionOptions): RequestHa
         if (view.validAfter > BigInt(t) || view.validBefore <= BigInt(t) || !payTo || view.to !== payTo) {
           return refuse(res, 'invalid_payment_authorization');
         }
+        // The connection may have closed earlier (while queued, or during body reading); its close event is then already past.
+        if (connectionClosed(res)) return;
         const bound = m.bind(req, res, payment, view);
         if (!bound) return;
         // Settlement happens at the gateway. Keep the envelope so a resend of the same payload gets the same bytes.
         sealing = true;
         let saved: Promise<void> = Promise.resolve();
+        // Set when the connection closes before the handler finishes: the lock is released then, and a
+        // late seal must not overwrite an envelope a retry stored meanwhile (it gets 409 instead).
+        let released = false;
         m.sealOnEnd(res, payment, view.digest, bound, (envelope) => {
-          saved = m.store.set(nonce, { envelope, authorizationDigest: digest }, m.retention);
+          if (released) return false;
+          saved = m.store.set(nonce, { envelope, authorizationDigest: digest, payer: view.from }, m.retention);
+          return true;
         });
-        res.on('close', () => void saved.catch(() => undefined).finally(unlock));
+        res.on('close', () => {
+          released = true;
+          void saved.catch(() => undefined).finally(unlock);
+        });
         next();
       } finally {
         if (!sealing) unlock();

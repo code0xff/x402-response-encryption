@@ -39,6 +39,10 @@ export class LocalFacilitator implements FacilitatorClient {
   used = new Set<string>();
   settlements = 0;
   failNextSettle = false;
+  /** Awaited at the start of settle, so a test can hold a settlement open. */
+  settleGate?: Promise<void>;
+  /** Called when settle starts. */
+  onSettle?: () => void;
   private async check(p: PaymentPayload, r: PaymentRequirements): Promise<{ from: string; nonce: string } | { invalid: string }> {
     if ('permit2Authorization' in p.payload) {
       const a = p.payload.permit2Authorization as Permit2Authorization;
@@ -68,6 +72,8 @@ export class LocalFacilitator implements FacilitatorClient {
     return { isValid: true, payer: c.from };
   }
   async settle(p: PaymentPayload, r: PaymentRequirements): Promise<SettleResponse> {
+    this.onSettle?.();
+    if (this.settleGate) await this.settleGate;
     const c = await this.check(p, r);
     if ('invalid' in c) return { success: false, errorReason: c.invalid, transaction: '', network: r.network };
     if (this.failNextSettle) {

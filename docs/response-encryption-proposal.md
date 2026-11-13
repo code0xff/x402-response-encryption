@@ -480,7 +480,7 @@ The server registers `keyId`, `publicKey`, `attestation`, `kid`, `ephemeralPubli
 
 ### 7.3 Success envelope
 
-The envelope is sent with HTTP status 200 and content type `application/x402-encrypted+json`. The resource's own 2xx status is carried in `status` and authenticated by the AAD (6.3), and the client restores it after decryption. This keeps a body on the wire for statuses that have none, such as 204. HEAD requests cannot carry an envelope and are not covered: the server rejects a paid HEAD request before settlement.
+The envelope is sent with HTTP status 200 and content type `application/x402-encrypted+json`. The resource's own 2xx status is carried in `status` and authenticated by the AAD (6.3), and the client restores it after decryption. This keeps a body on the wire for statuses that have none, such as 204. HEAD requests cannot carry an envelope and are not covered: the server rejects a paid HEAD request before settlement. Only 2xx resource responses are encrypted. A 1xx or 3xx response to a paid request has no envelope to return or keep for retries, so the seller answers with an error status of 400 or above instead, which also stops settlement.
 
 ```json
 {
@@ -556,10 +556,10 @@ If the response is lost after settlement (a dropped connection, an intermediary 
 
 **Seller**
 
-- After settlement succeeds, store the envelope keyed by the signed commitment (3.5), the authorization `nonce` in the EIP-3009 profile, together with the authorization digest (6.1), for a retention period. 24 hours is the recommended minimum.
-- On a paid request, look up the signed commitment before contacting the facilitator. If an envelope is stored, require the presented authorization to have the stored digest, verify the client's signature locally as the profile defines (3.5) and recompute `c` (3.1) as usual, then return the stored envelope byte for byte. The commitment alone is not enough: its inputs are public, so anyone can sign a different authorization carrying the same value. Do not call the facilitator, settle, or run the request again.
+- After settlement succeeds, store the envelope keyed by the signed commitment (3.5), the authorization `nonce` in the EIP-3009 profile, together with the authorization digest (6.1) and the payer's address, for a retention period. 24 hours is the recommended minimum.
+- On a paid request, look up the signed commitment before contacting the facilitator. If an envelope is stored, require the presented authorization to have the stored digest and payer, verify the client's signature locally as the profile defines (3.5) and recompute `c` (3.1) as usual, then return the stored envelope byte for byte. The commitment alone is not enough: its inputs are public, so anyone can sign a different authorization carrying the same value. The digest alone is not enough either: the Permit2 typed data does not include the owner, so another key can sign the identical message. A paid request whose commitment has a stored envelope but whose authorization does not match is refused, not passed to the facilitator: under Permit2 another owner's signature over the same commitment is a valid new payment, and settling it would replace the stored envelope and break the original payer's retry. Do not call the facilitator, settle, or run the request again.
 - The `keyId` check and the authorization's validity window are skipped for a stored envelope: the key may have been rotated out since settlement (4.4), and the window may have closed while the client was retrying. The stored envelope does not need the private key.
-- Serialize processing per signed commitment, taking the lock before the lookup and holding it until the envelope is stored, so a duplicate that arrives while the first request is still running waits for it instead of running the request twice. Sellers with several workers need a shared lock. The scheme's own replay protection stops a second settlement (in EIP-3009 the token contract rejects a used nonce); the lock prevents double execution.
+- Serialize processing per signed commitment, taking the lock before the lookup and holding it until the envelope is stored, so a duplicate that arrives while the first request is still running waits for it instead of running the request twice. Sellers with several workers need a shared lock. If a request gives up the lock before its envelope is stored (its connection closed while the handler ran), the seller must not settle that request when the handler later completes, because the envelope could not be kept for the payer's retry; locks, pending envelopes and settlement callbacks belong to the request that took the lock, not to the commitment alone, since other requests can carry the same commitment. The scheme's own replay protection stops a second settlement (in EIP-3009 the token contract rejects a used nonce); the lock prevents double execution.
 - Recomputing `c` is what stops a replayed payload from being used for a different request: changing the method, URL or body changes `requestHash`, and the request is rejected with `response_encryption_nonce_mismatch` instead of receiving the stored envelope.
 
 Returning a stored envelope to whoever presents the payload discloses nothing new. It is ciphertext that already passed through every intermediary on the first attempt, and only the holder of `e` can decrypt it.
@@ -600,7 +600,7 @@ Seller-side forward secrecy would need the seller to use a per-response ephemera
 | Test vectors and an independent Python verifier sharing no code with the generator | `test-vectors` |
 | Base Sepolia demo through a logging reverse proxy, EIP-3009 or Permit2 (`--permit2`) | `examples/base-sepolia` |
 
-Scope: `exact` on Base Sepolia with EIP-3009 or Permit2, EOA payers and `payTo`, single JSON responses. The Permit2 path is tested end to end in deployment A; deployment B accepts Permit2 terms but its tests use EIP-3009. SVM has vectors only. The did:web profile is covered by test vectors (DID document and its cases) but the client wrapper does not resolve DID documents.
+Scope: `exact` on Base Sepolia with EIP-3009 or Permit2, EOA payers and `payTo`, single JSON responses. The Permit2 path is tested end to end in both deployments. SVM has vectors only. The did:web profile is covered by test vectors (DID document and its cases) but the client wrapper does not resolve DID documents.
 
 ### 10.2 Results
 
@@ -633,9 +633,19 @@ The end-to-end tests run the real `@x402/express` middleware with an in-process 
 | Key rotated between 402 and paid request | One `unknown_key_id` 402, then success with the new key | A |
 | Settlement failure | Not treated as a paid response; nothing released | A |
 | Plaintext success response | Client refuses it | A |
-| Normal payment through Permit2, `c` as the Permit2 nonce | Decrypted; no plaintext in the intermediary log | A (Permit2), Base Sepolia |
+| Normal payment through Permit2, `c` as the Permit2 nonce | Decrypted; no plaintext in the intermediary log | A (Permit2), B (Permit2), Base Sepolia |
 | Permit2: ephemeral key swapped; Permit2 nonce rewritten | Rejected before settlement, `nonce_mismatch`; signature check fails | A (Permit2), A.9 |
 | Permit2: paid response lost in transit | Stored envelope returned, one settlement | A (Permit2) |
+| Permit2: gateway relays an authorization with an unaccepted token, an amount below the price, another spender, another recipient, a window not yet open or a past deadline, or a signature that does not recover `from` | Origin refuses, handler not run | B (Permit2) |
+| Permit2: EIP-3009 payload sent to an origin configured only for Permit2 | Origin refuses | B (Permit2) |
+| Permit2: retry after the deadline; different authorization reusing the nonce | Stored envelope returned and a new execution refused; reuse refused | B (Permit2) |
+| Permit2: another owner signs the identical message (the typed data has no owner field, so the digest matches) | Refused without settlement; the original payer's retry still gets the stored envelope | A (Permit2), B (Permit2) |
+| Permit2: another owner sends the same commitment with the extension stripped while the payer's settlement is in flight | Refused; the payer's envelope is still stored and returned on retry | A (Permit2) |
+| Connection closes while the handler runs; the handler finishes later | That request is not settled; the payer's resend settles once and is served | A (Permit2) |
+| Handler destroys its response without ending it | Lock released; a resend is processed | A (Permit2) |
+| Paid handler returns a 3xx, through `res.redirect` or `writeHead(304)` | Answered with 500, not settled | A (Permit2) |
+| Origin: connection closes mid-handler, the gateway resends, then the first handler finishes | The resend's stored envelope is kept; the late result is not stored | B (Permit2) |
+| Origin: a duplicate disconnects while waiting for the lock, then receives it | It releases the lock at once; the next resend is served | B (Permit2) |
 | Interoperability | `nonce`, `requestHash`, `K` and ciphertext reproduced by the Python verifier, for EIP-3009, Permit2 and SVM | A.1 to A.9 |
 
 On Base Sepolia the demo settled a real payment through an in-process facilitator from the x402 SDK: [`0x8c2191ab…bdbef3`](https://sepolia.basescan.org/tx/0x8c2191ab2797655f0b718d10df583934d8e517189c89f533fbe9e96ff9bdbef3). The reverse proxy recorded the request body `{"quarter":"Q3"}` in plaintext, as expected (requests are out of scope, 11), and only the envelope for the response. The same demo with `--permit2` settled through Permit2 and `x402ExactPermit2Proxy`, after a one-time ERC-20 approval of Permit2 by the client: [`0x4a422231…ec174b`](https://sepolia.basescan.org/tx/0x4a42223178ee8d647c6cdaeaee7e82645190528915c98b7c726964777cec174b).

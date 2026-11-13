@@ -8,10 +8,11 @@ import { paymentMiddleware, x402ResourceServer } from '@x402/express';
 import { ExactEvmScheme } from '@x402/evm/exact/server';
 import { decodePaymentRequiredHeader, decodePaymentSignatureHeader, encodePaymentSignatureHeader } from '@x402/core/http';
 import { secp256k1 } from '@noble/curves/secp256k1';
-import { commitmentToPermit2Nonce, toHex } from '@x402-response-encryption/core';
+import { privateKeyToAccount } from 'viem/accounts';
+import { commitmentToPermit2Nonce, permit2TypedData, toHex, type Permit2Authorization } from '@x402-response-encryption/core';
 import { wrapFetchWithEncryptedPayment } from '@x402-response-encryption/fetch';
 import { createResponseEncryption, type SellerKeyConfig } from '../src/index.js';
-import { LocalFacilitator, NETWORK, SECRET, keyConfig, listen, payTo, payer, testKey } from './helpers.js';
+import { CHAIN_ID, LocalFacilitator, NETWORK, SECRET, keyConfig, listen, payTo, payer, testKey } from './helpers.js';
 
 function loggingProxy(target: string) {
   const log: string[] = [];
@@ -42,6 +43,14 @@ let seller: Server;
 let proxy: ReturnType<typeof loggingProxy>;
 let url: string;
 let executions = 0;
+/** Makes the next handler run destroy its response without ending it. */
+let destroyNext = false;
+let redirectNext = false;
+let notModifiedNext = false;
+/** Holds the handler open until a test resolves it. */
+let handlerGate: Promise<void> | undefined;
+let handlerEntered: (() => void) | undefined;
+let sellerUrl: string;
 
 beforeAll(async () => {
   const keys = [await keyConfig('enc-permit2')] as [SellerKeyConfig];
@@ -65,12 +74,20 @@ beforeAll(async () => {
     ),
   );
   app.use(enc.after);
-  app.post('/v1/report', (_req, res) => {
+  app.post('/v1/report', async (_req, res) => {
     executions++;
+    if (destroyNext) return void ((destroyNext = false), res.destroy());
+    if (redirectNext) return void ((redirectNext = false), res.redirect(302, '/elsewhere'));
+    if (notModifiedNext) return void ((notModifiedNext = false), res.writeHead(304, { etag: '"v1"' }), res.end());
+    if (handlerGate) {
+      handlerEntered?.();
+      await handlerGate;
+    }
     res.json(JSON.parse(SECRET));
   });
   seller = createServer(app);
-  proxy = loggingProxy(await listen(seller));
+  sellerUrl = await listen(seller);
+  proxy = loggingProxy(sellerUrl);
   url = (await listen(proxy.server)) + '/v1/report';
 });
 
@@ -95,6 +112,19 @@ async function signedHeader(): Promise<string> {
   };
   await wrapFetchWithEncryptedPayment(capture, { signer: payer, transportRetries: 0 })(url, { method: 'POST', body: '{}' }).catch(() => undefined);
   return header!;
+}
+/** Straight to the seller with the proxy's Host, so resource.url still matches. Resolves undefined on a dropped connection. */
+function direct(header: string, onRequest?: (r: ReturnType<typeof httpRequest>) => void) {
+  return new Promise<number | undefined>((resolve) => {
+    const r = httpRequest(sellerUrl + '/v1/report', {
+      method: 'POST',
+      headers: { host: new URL(url).host, 'PAYMENT-SIGNATURE': header, 'content-length': '2' },
+    });
+    r.on('response', (res) => (res.resume(), resolve(res.statusCode)));
+    r.on('error', () => resolve(undefined));
+    r.end('{}');
+    onRequest?.(r);
+  });
 }
 const sendPaid = (header: string) => fetch(url, { method: 'POST', body: '{}', headers: { 'PAYMENT-SIGNATURE': header } });
 
@@ -151,6 +181,102 @@ describe('Permit2 profile', () => {
     const again = await sendPaid(header);
     expect(again.status).toBe(200);
     expect(await again.text()).toBe(await first.text());
+    expect(facilitator.settlements).toBe(before);
+  });
+
+  it('refuses another owner signing the identical Permit2 message, and still serves the payer\'s retry', async () => {
+    const header = await signedHeader();
+    const first = await sendPaid(header);
+    expect(first.status).toBe(200);
+    const stored = await first.text();
+    // Permit2 typed data has no owner field, so this signature covers the same digest.
+    const p = decodePaymentSignatureHeader(header);
+    const other = privateKeyToAccount(toHex(testKey('other-owner')));
+    const auth = { ...(p.payload.permit2Authorization as Permit2Authorization), from: other.address };
+    p.payload = { permit2Authorization: auth, signature: await other.signTypedData(permit2TypedData(CHAIN_ID, auth)) };
+    const before = facilitator.settlements;
+    const res = await sendPaid(encodePaymentSignatureHeader(p));
+    expect(res.status).toBe(402);
+    expect(facilitator.settlements).toBe(before);
+    const retry = await sendPaid(header);
+    expect(retry.status).toBe(200);
+    expect(await retry.text()).toBe(stored);
+  });
+
+  it('keeps the payer\'s envelope when another owner sends the same commitment without the extension during settlement', async () => {
+    const header = await signedHeader();
+    let open!: () => void;
+    facilitator.settleGate = new Promise<void>((r) => (open = r));
+    const entered = new Promise<void>((r) => (facilitator.onSettle = r));
+    const honest = sendPaid(header);
+    await entered;
+    facilitator.onSettle = undefined;
+    // Same commitment, signed by another owner, extension stripped: it skips the lock and x402 verifies it.
+    const p = decodePaymentSignatureHeader(header);
+    const other = privateKeyToAccount(toHex(testKey('stripping-owner')));
+    const auth = { ...(p.payload.permit2Authorization as Permit2Authorization), from: other.address };
+    p.payload = { permit2Authorization: auth, signature: await other.signTypedData(permit2TypedData(CHAIN_ID, auth)) };
+    delete p.extensions;
+    const stripped = await sendPaid(encodePaymentSignatureHeader(p));
+    expect(stripped.status).not.toBe(200);
+    facilitator.settleGate = undefined;
+    open();
+    const first = await honest;
+    expect(first.status).toBe(200);
+    const body = await first.text();
+    const before = facilitator.settlements;
+    const retry = await sendPaid(header);
+    expect(retry.status).toBe(200);
+    expect(await retry.text()).toBe(body);
+    expect(facilitator.settlements).toBe(before);
+  });
+
+  it('does not leave the lock held when a handler destroys its response without ending it', async () => {
+    const header = await signedHeader();
+    destroyNext = true;
+    expect(await direct(header)).toBeUndefined();
+    const retry = await Promise.race([direct(header), new Promise<'blocked'>((r) => setTimeout(() => r('blocked'), 2000))]);
+    expect(retry).toBe(200);
+    expect(executions).toBe(2);
+  });
+
+  it('does not settle a request that lost the lock when its connection closed mid-handler', async () => {
+    const header = await signedHeader();
+    let open!: () => void;
+    handlerGate = new Promise<void>((r) => (open = r));
+    const entered = new Promise<void>((r) => (handlerEntered = r));
+    let client!: ReturnType<typeof httpRequest>;
+    const first = direct(header, (r) => (client = r));
+    await entered;
+    handlerEntered = undefined;
+    client.destroy();
+    expect(await first).toBeUndefined();
+    await new Promise((r) => setTimeout(r, 50));
+    const before = facilitator.settlements;
+    // The handler finishes after its request released the lock: no settlement, so nothing is charged without a kept envelope.
+    handlerGate = undefined;
+    open();
+    await new Promise((r) => setTimeout(r, 50));
+    expect(facilitator.settlements).toBe(before);
+    // The payer's resend settles once and gets an envelope.
+    expect(await sendPaid(header).then((r) => r.status)).toBe(200);
+    expect(facilitator.settlements).toBe(before + 1);
+  });
+
+  it('does not settle a paid 3xx response, which has no envelope', async () => {
+    const before = facilitator.settlements;
+    redirectNext = true;
+    const res = await sendPaid(await signedHeader());
+    expect(res.status).toBe(500);
+    expect(res.headers.get('location')).toBeNull();
+    expect(facilitator.settlements).toBe(before);
+  });
+
+  it('does not settle a paid 304 set through writeHead', async () => {
+    const before = facilitator.settlements;
+    notModifiedNext = true;
+    const res = await sendPaid(await signedHeader());
+    expect(res.status).toBe(500);
     expect(facilitator.settlements).toBe(before);
   });
 });
