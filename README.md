@@ -6,6 +6,8 @@ An x402 response usually crosses CDNs, reverse proxies, API gateways or marketpl
 
 Status: design draft. Nothing here has been adopted into the x402 specification.
 
+Overview page: https://code0xff.github.io/x402-response-encryption/
+
 ## Contents
 
 | Path | What it is |
