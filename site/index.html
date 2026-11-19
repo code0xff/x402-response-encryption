@@ -21,7 +21,9 @@
   --muted: light-dark(#66666c, #a3a3aa);
   --ok: light-dark(#18794e, #4cc38a);
   --bad: light-dark(#b42318, #f97066);
+  --warn: light-dark(#a15c07, #f5b14c);
   --head: 52px;
+  --ease: cubic-bezier(.2, 0, 0, 1);
   --sans: "Pretendard", system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   --mono: "JetBrains Mono", "Pretendard", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
@@ -29,119 +31,231 @@
 :root[data-theme="dark"] { color-scheme: dark; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: calc(var(--head) + 16px); }
-body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 a { color: inherit; }
 code, pre, .mono { font-family: var(--mono); }
-.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+svg.i { width: 16px; height: 16px; flex: none; }
+
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes draw { 0% { transform: scaleX(0); } }
+@keyframes lnin { 0% { opacity: 0; transform: translate(-50%, 6px); } }
+@keyframes fadein { 0% { opacity: 0; } }
+@keyframes rise { 0% { opacity: 0; transform: translateY(6px); } }
+@keyframes pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity .5s var(--ease), transform .5s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+.caret { display: inline-block; width: .55em; height: 1.15em; margin-left: 2px; vertical-align: -.2em; background: var(--text); animation: blink 1.05s step-end infinite; }
 
 /* nav */
-header.top { position: sticky; top: 0; z-index: 10; height: var(--head); border-bottom: 1px solid var(--border);
+header.top { position: sticky; top: 0; z-index: 20; height: var(--head); border-bottom: 1px solid var(--border);
   background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(8px); }
 header.top .wrap { height: 100%; display: flex; align-items: center; gap: 24px; }
-.brand { font: 600 14px var(--mono); text-decoration: none; white-space: nowrap; }
+.brand { display: flex; align-items: center; gap: 8px; font: 600 14px var(--mono); text-decoration: none; white-space: nowrap; }
+.brand .lock { width: 18px; height: 18px; }
 .brand span { color: var(--muted); font-weight: 400; }
-nav.links { display: flex; gap: 18px; margin-left: auto; font-size: 13px; }
-nav.links a { color: var(--muted); text-decoration: none; }
+nav.links { display: flex; align-items: center; gap: 18px; margin-left: auto; font-size: 13px; }
+nav.links a { color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
 nav.links a:hover { color: var(--text); }
-@media (max-width: 760px) { nav.links a.opt { display: none; } .brand span { display: none; } }
-.card, .steps > *, .compare > *, .two > * { min-width: 0; }
-body { overflow-x: hidden; }
+nav.links a.gh { color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; background: var(--surface); font: 500 12px var(--mono); }
+nav.links a.gh:hover { border-color: var(--muted); }
+@media (max-width: 820px) { nav.links a.opt { display: none; } .brand span { display: none; } }
 
 /* hero */
-.hero { padding: 72px 0 56px; border-bottom: 1px solid var(--border); }
-.eyebrow { font: 500 12px var(--mono); color: var(--muted); letter-spacing: .02em; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.hero { padding: 64px 0; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+.hero::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px; opacity: .35;
+  mask-image: radial-gradient(ellipse 70% 60% at 70% 40%, #000 20%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse 70% 60% at 70% 40%, #000 20%, transparent 75%); }
+.hero .wrap { position: relative; display: grid; grid-template-columns: 1fr 1.08fr; gap: 40px; align-items: center; }
+@media (max-width: 960px) { .hero .wrap { grid-template-columns: 1fr; } }
+.hero .wrap > * { min-width: 0; }
+.eyebrow { font: 500 12px var(--mono); color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .tag { border: 1px solid var(--border); background: var(--surface); padding: 2px 8px; border-radius: 6px; font: 500 12px var(--mono); color: var(--muted); }
-h1 { font-size: clamp(32px, 5.4vw, 56px); line-height: 1.1; letter-spacing: -0.025em; margin: 20px 0 18px; font-weight: 600; max-width: 16ch; }
-.lead { font-size: 17px; color: var(--muted); max-width: 62ch; margin: 0 0 28px; }
+.tag .live { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); margin-right: 6px; vertical-align: 1px; animation: pulse 2s infinite; }
+h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.08; letter-spacing: -0.03em; margin: 20px 0 18px; font-weight: 600; }
+h1 .cipher { font-family: var(--mono); font-weight: 500; letter-spacing: -0.04em; color: var(--muted); }
+.lead { font-size: 17px; color: var(--muted); max-width: 56ch; margin: 0 0 28px; }
 .cta { display: flex; gap: 10px; flex-wrap: wrap; }
 .btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--border);
-  background: var(--surface); text-decoration: none; font: 500 13px var(--mono); }
+  background: var(--surface); text-decoration: none; font: 500 13px var(--mono); transition: border-color .15s, transform .15s var(--ease); }
 .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
-.btn:hover { border-color: var(--muted); }
+.btn:hover { border-color: var(--muted); transform: translateY(-1px); }
+
+/* terminal */
+.term { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  box-shadow: 0 1px 0 var(--border), 0 24px 60px -30px color-mix(in srgb, var(--text) 35%, transparent); }
+.term-bar { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); background: var(--soft); font: 500 12px var(--mono); color: var(--muted); }
+.term-bar .dots { display: flex; gap: 6px; margin-right: 6px; }
+.term-bar .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--border); display: block; }
+.term-bar .sp { margin-left: auto; }
+.iconbtn { display: inline-flex; align-items: center; gap: 6px; font: 500 11px var(--mono); color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; cursor: pointer; }
+.iconbtn:hover { color: var(--text); border-color: var(--muted); }
+.iconbtn svg { width: 12px; height: 12px; }
+.term-body { margin: 0; padding: 16px; height: 400px; overflow: hidden; font: 12.5px/1.7 var(--mono); white-space: pre-wrap; word-break: break-all; }
+.ln { animation: rise .18s var(--ease) both; }
+.t-m { color: var(--muted); }
+.t-ok { color: var(--ok); }
+.t-bad { color: var(--bad); }
+.t-w { color: var(--warn); }
+.t-b { font-weight: 600; }
+.t-p { color: var(--muted); user-select: none; }
 
 /* sections */
-section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+section { padding: 72px 0; border-bottom: 1px solid var(--border); }
 .label { font: 500 12px var(--mono); color: var(--muted); margin: 0 0 8px; }
-h2 { font-size: clamp(22px, 3vw, 30px); letter-spacing: -0.015em; line-height: 1.25; margin: 0 0 12px; font-weight: 600; }
+.label b { font-weight: 600; color: var(--text); }
+h2 { font-size: clamp(24px, 3vw, 32px); letter-spacing: -0.02em; line-height: 1.2; margin: 0 0 12px; font-weight: 600; }
 .sub { color: var(--muted); max-width: 66ch; margin: 0 0 32px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; min-width: 0; }
+.bar-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px 10px 16px; border-bottom: 1px solid var(--border); font: 500 12px var(--mono); color: var(--muted); flex-wrap: wrap; }
 
 /* sequence */
-.seq { padding: 20px; overflow-x: auto; }
-.seq pre { margin: 0; font-size: 12.5px; line-height: 1.7; color: var(--text); }
-.seq .m { color: var(--muted); }
+.sq-card { overflow: hidden; }
+.sq-scroll { overflow-x: auto; }
+.sq { --row: 32px; position: relative; min-width: 720px; padding: 16px 0 12px; font-family: var(--mono); }
+.sq-life { position: absolute; top: 44px; bottom: 0; width: 0; border-left: 1px dashed var(--border); }
+.sq-actors { position: relative; height: 56px; }
+.sq-actor { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.sq-actor b { font: 500 12px var(--sans); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 3px 10px; white-space: nowrap; transition: border-color .2s, box-shadow .2s; position: relative; z-index: 1; }
+.sq-actor small { font: 400 10px var(--mono); color: var(--muted); letter-spacing: .04em; text-transform: uppercase; background: var(--surface); white-space: nowrap; position: relative; z-index: 1; }
+.sq-actor.hit b { border-color: var(--text); box-shadow: 0 0 0 3px color-mix(in srgb, var(--text) 10%, transparent); }
+.sq-actor.eve b { border-style: dashed; }
+.sq-msg { position: relative; height: var(--row); }
+.sq-arrow { position: absolute; top: 22px; left: var(--l); width: var(--w); height: 1px; background: var(--text); transform-origin: var(--o); }
+.sq-arrow.dash { background: repeating-linear-gradient(90deg, var(--text) 0 4px, transparent 4px 7px); }
+.sq-arrow::after { content: ""; position: absolute; top: -3.5px; border: 4px solid transparent; }
+.sq-arrow.r::after { right: -2px; border-left: 6px solid var(--text); border-right: 0; }
+.sq-arrow.l::after { left: -2px; border-right: 6px solid var(--text); border-left: 0; }
+.sq-label { position: absolute; top: 3px; left: calc(var(--l) + var(--w) / 2); transform: translateX(-50%); font-size: 11px; line-height: 16px; white-space: nowrap; background: var(--surface); padding: 0 5px; }
+.sq-label.ok::before { content: "✓ "; color: var(--ok); }
+.sq-label.enc { color: var(--ok); }
+.sq-note { position: absolute; top: 5px; left: var(--x); transform: translateX(-50%); font-size: 11px; color: var(--muted); background: var(--soft); border: 1px solid var(--border); border-radius: 4px; padding: 0 8px; white-space: nowrap; line-height: 18px; }
+.sq-note.r { transform: translateX(-100%); }
+.sq-note.lft { transform: none; }
+.sq .hid { opacity: 0; }
+.sq-arrow.play { animation: draw .42s var(--ease) both; }
+.sq-label.play, .sq-note.play { animation: lnin .2s var(--ease) .18s both; }
+.sq-note.r.play, .sq-note.lft.play { animation: fadein .2s var(--ease) .1s both; }
+.readout { border-top: 1px solid var(--border); background: var(--soft); padding: 12px 16px; min-height: 48px; font: 12px/1.6 var(--mono); color: var(--muted); }
+.readout .k { color: var(--text); }
 
 /* steps */
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-@media (max-width: 900px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 960px) { .steps { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
-.step { padding: 20px; }
-.step .n { font: 600 12px var(--mono); color: var(--muted); }
-.step h3 { margin: 10px 0 6px; font-size: 16px; font-weight: 600; }
+.step { padding: 20px; position: relative; overflow: hidden; transition: border-color .2s, transform .2s var(--ease); }
+.step:hover { border-color: var(--muted); transform: translateY(-2px); }
+.step .n { font: 600 12px var(--mono); color: var(--muted); display: flex; justify-content: space-between; }
+.step h3 { margin: 12px 0 6px; font-size: 16px; font-weight: 600; }
 .step p { margin: 0; color: var(--muted); font-size: 14px; }
+.step .bar { position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: var(--text); transform: scaleX(0); transform-origin: left; }
+.reveal.in .step .bar { animation: draw .8s var(--ease) both; transform: none; }
+.reveal.in .step:nth-child(2) .bar { animation-delay: .15s; }
+.reveal.in .step:nth-child(3) .bar { animation-delay: .3s; }
+.reveal.in .step:nth-child(4) .bar { animation-delay: .45s; }
 
-/* compare */
-.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
-.compare .card { overflow: hidden; }
-.compare .head { padding: 12px 16px; border-bottom: 1px solid var(--border); font: 500 12px var(--mono); display: flex; justify-content: space-between; gap: 8px; }
-.compare pre { margin: 0; padding: 16px; font-size: 12px; line-height: 1.6; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
-.dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+/* proxy log */
+.tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; padding: 3px; background: var(--soft); gap: 3px; flex-wrap: wrap; }
+.tabs button { font: 500 12px var(--mono); color: var(--muted); background: transparent; border: 0; border-radius: 6px; padding: 5px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 0 0 1px var(--border); }
+.dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.log-body { margin: 0; padding: 16px; min-height: 270px; font: 12px/1.75 var(--mono); white-space: pre-wrap; word-break: break-all; }
+.leak { background: color-mix(in srgb, var(--bad) 16%, transparent); color: var(--bad); border-radius: 3px; padding: 0 2px; }
+.sealed { color: var(--ok); }
+.verdict { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--border); font: 500 12px var(--mono); background: var(--soft); min-height: 41px; }
 
-/* code */
-.code { position: relative; }
-.code pre { margin: 0; padding: 18px 16px; font-size: 12.5px; line-height: 1.65; overflow-x: auto; }
-.code .bar { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px 8px 16px; border-bottom: 1px solid var(--border); font: 500 12px var(--mono); color: var(--muted); }
-.copy { font: 500 11px var(--mono); color: var(--muted); background: var(--soft); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; cursor: pointer; }
-.copy:hover { color: var(--text); }
-.c { color: var(--muted); }
-.qs { display: grid; gap: 14px; }
+/* attack lab */
+.lab { display: grid; grid-template-columns: 320px 1fr; gap: 12px; }
+@media (max-width: 860px) { .lab { grid-template-columns: 1fr; } }
+.attacks { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+.attacks button { text-align: left; font: 14px var(--sans); color: var(--text); background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 10px 12px; cursor: pointer; display: flex; gap: 10px; align-items: flex-start; transition: background .15s, border-color .15s; }
+.attacks button:hover { background: var(--soft); }
+.attacks button[aria-pressed="true"] { background: var(--soft); border-color: var(--border); }
+.attacks button .k { font: 600 11px var(--mono); color: var(--muted); padding-top: 2px; }
+.attacks button small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.lab-out { display: flex; flex-direction: column; }
+.lab-out pre { margin: 0; padding: 16px; flex: 1; min-height: 250px; font: 12.5px/1.75 var(--mono); white-space: pre-wrap; word-break: break-all; }
 
-/* tables */
+/* table */
 .table { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th, td { text-align: left; padding: 13px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
 th { font: 500 12px var(--mono); color: var(--muted); background: var(--soft); white-space: nowrap; }
 tr:last-child td { border-bottom: 0; }
 td code { font-size: 12.5px; background: var(--soft); padding: 1px 5px; border-radius: 4px; }
-.pill { font: 500 11px var(--mono); padding: 2px 7px; border-radius: 99px; border: 1px solid var(--border); white-space: nowrap; }
+.pill { font: 500 11px var(--mono); padding: 2px 8px; border-radius: 99px; border: 1px solid var(--border); white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
 .pill.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, var(--border)); }
+.pill.ok::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
 .pill.part { color: var(--muted); }
+.pill.part::before { content: ""; width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--muted); }
 
-/* lists */
+/* code */
+.qs { display: grid; gap: 12px; }
+.code pre { margin: 0; padding: 18px 16px; font-size: 12.5px; line-height: 1.7; overflow-x: auto; }
+.c { color: var(--muted); }
+.kw { color: var(--muted); }
+.st { color: var(--ok); }
+
+/* scope */
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
 .two .card { padding: 20px; }
-.two h3 { margin: 0 0 10px; font: 600 13px var(--mono); }
+.two h3 { margin: 0 0 10px; font: 600 13px var(--mono); display: flex; align-items: center; gap: 8px; }
 .two ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
-.two li { margin: 6px 0; }
+.two li { margin: 7px 0; }
 .two li b { color: var(--text); font-weight: 500; }
 
 /* faq */
 details { border-bottom: 1px solid var(--border); padding: 16px 0; }
 details:first-of-type { border-top: 1px solid var(--border); }
 summary { cursor: pointer; font-weight: 500; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
-summary::after { content: "+"; font-family: var(--mono); color: var(--muted); }
-details[open] summary::after { content: "−"; }
-details p { color: var(--muted); margin: 10px 0 0; max-width: 72ch; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-family: var(--mono); color: var(--muted); transition: transform .2s var(--ease); }
+details[open] summary::after { transform: rotate(45deg); }
+details p { color: var(--muted); margin: 10px 0 0; max-width: 72ch; animation: rise .25s var(--ease) both; }
+
+.closing { text-align: center; }
+.closing h2 { max-width: 22ch; margin: 0 auto 14px; }
+.closing .sub { margin: 0 auto 28px; }
+.closing .cta { justify-content: center; }
 
 footer { padding: 36px 0 48px; font-size: 13px; color: var(--muted); }
-footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; }
 footer .mono { font-size: 12px; }
-footer a { color: var(--muted); }
+footer a { color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+footer a:hover { color: var(--text); }
+footer .fl { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .caret, .sq .play, .ln, .tag .live, .step .bar { animation: none !important; }
+  .sq .hid { opacity: 1; }
+}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.130-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.750-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></symbol>
+  <symbol id="i-issue" viewBox="0 0 16 16"><path fill="currentColor" d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/><path fill="currentColor" d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 16 16"><path fill="currentColor" d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"/></symbol>
+  <symbol id="i-replay" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#">x402-response-encryption <span>v1 draft</span></a>
+    <a class="brand" href="#"><svg class="lock"><use href="#i-lock"/></svg>x402-response-encryption <span>v1 draft</span></a>
     <nav class="links">
-      <a class="opt" href="#how">How it works</a>
-      <a class="opt" href="#profiles">Payment schemes</a>
+      <a class="opt" href="#flow">Flow</a>
+      <a class="opt" href="#lab">Try an attack</a>
+      <a class="opt" href="#profiles">Schemes</a>
       <a class="opt" href="#quickstart">Quick start</a>
-      <a href="https://github.com/x402-foundation/x402/issues/4223">Proposal</a>
-      <a href="https://github.com/code0xff/x402-response-encryption">GitHub</a>
+      <a href="https://github.com/x402-foundation/x402/issues/4223" aria-label="Proposal issue #4223"><svg class="i"><use href="#i-issue"/></svg>#4223</a>
+      <a class="gh" href="https://github.com/code0xff/x402-response-encryption" aria-label="GitHub repository"><svg class="i"><use href="#i-github"/></svg>GitHub</a>
     </nav>
   </div>
 </header>
@@ -149,76 +263,95 @@ footer a { color: var(--muted); }
 <main>
 <div class="hero">
   <div class="wrap">
-    <div class="eyebrow"><span>x402 v2 extension</span><span class="tag">design draft</span><span class="tag">Apache-2.0</span></div>
-    <h1>Paid responses only the payer can read.</h1>
-    <p class="lead">An x402 response passes through CDNs, reverse proxies, payment gateways and marketplaces that terminate TLS and can log or cache it. With this extension the seller encrypts the body to a key the client committed inside its payment signature, so everything in between relays ciphertext.</p>
-    <div class="cta">
-      <a class="btn primary" href="#quickstart">Quick start</a>
-      <a class="btn" href="https://github.com/code0xff/x402-response-encryption/blob/main/docs/response-encryption-proposal.md">Read the proposal</a>
-      <a class="btn" href="https://github.com/x402-foundation/x402/issues/4223">Discussion · #4223</a>
+    <div>
+      <div class="eyebrow"><span>x402 v2 extension</span><span class="tag"><span class="live"></span>design draft</span><span class="tag">Apache-2.0</span></div>
+      <h1>Paid responses only the payer can <span id="swap">read.</span></h1>
+      <p class="lead">An x402 response passes through CDNs, reverse proxies, payment gateways and marketplaces that terminate TLS and can log it. With this extension the seller encrypts the body to a key the client committed inside its payment signature. Everything in between relays ciphertext.</p>
+      <div class="cta">
+        <a class="btn primary" href="#quickstart">Quick start <svg class="i"><use href="#i-arrow"/></svg></a>
+        <a class="btn" href="https://github.com/code0xff/x402-response-encryption"><svg class="i"><use href="#i-github"/></svg>Repository</a>
+        <a class="btn" href="https://github.com/code0xff/x402-response-encryption/blob/main/docs/response-encryption-proposal.md"><svg class="i"><use href="#i-doc"/></svg>Proposal</a>
+      </div>
+    </div>
+    <div class="term" aria-label="Terminal replay of the Base Sepolia Permit2 demo">
+      <div class="term-bar"><span class="dots"><i></i><i></i><i></i></span>examples/base-sepolia<span class="sp"></span><button class="iconbtn" id="term-replay" type="button"><svg><use href="#i-replay"/></svg>replay</button></div>
+      <pre class="term-body" id="term"></pre>
     </div>
   </div>
 </div>
 
 <section id="flow">
-  <div class="wrap">
-    <p class="label">One paid call, end to end</p>
+  <div class="wrap reveal">
+    <p class="label">01 · <b>One paid call, end to end</b></p>
     <h2>The payment signature carries the client's key</h2>
-    <p class="sub">The client generates a fresh key pair for each request and puts a commitment to its public key in a field the payment already signs. An intermediary that swaps the key breaks the signature. One that swaps the seller's key has to redirect the payment on-chain.</p>
-    <div class="card seq"><pre><span class="m">client                     intermediary (CDN, gateway)           seller</span>
-  │ request ──────────────────────────────────────────────────────▶
-  │ ◀──────────────────────────────── 402  key M, attested by payTo
-  │ <span class="m">verify attestation, generate (e, E)</span>
-  │ <span class="m">c = keccak256(tag ‖ E ‖ keyId ‖ requestHash ‖ r)</span>
-  │ <span class="m">sign payment with nonce = c</span>
-  │ paid request  E, r ───────────────────────────────────────────▶
-  │                                       <span class="m">recompute c, check signature</span>
-  │                                       <span class="m">settle, run handler</span>
-  │                                       <span class="m">K = HKDF(ECDH(m, E), digest)</span>
-  │ ◀──────────────────────────── 200  AES-256-GCM envelope
-  │ <span class="m">K = HKDF(ECDH(e, M), digest), decrypt</span></pre></div>
+    <p class="sub">The client makes a fresh key pair for each request and commits its public key into the nonce the payment already signs. Swapping that key breaks the signature. Swapping the seller's key means redirecting the payment on-chain.</p>
+    <div class="card sq-card">
+      <div class="bar-top"><span>sequence · EIP-3009 or Permit2 · exact</span><button class="iconbtn" id="sq-replay" type="button"><svg><use href="#i-replay"/></svg>replay</button></div>
+      <div class="sq-scroll">
+        <div class="sq" id="sq" role="img" aria-label="Sequence: the client requests, gets a 402 with the seller key attested by payTo, commits an ephemeral key into the payment nonce, and sends the paid request through an intermediary. The seller recomputes the commitment, settles through the facilitator and returns an encrypted envelope that only the client can open.">
+          <span class="sq-life" style="left:10%"></span><span class="sq-life" style="left:37%"></span><span class="sq-life" style="left:64%"></span><span class="sq-life" style="left:90%"></span>
+          <div class="sq-actors" aria-hidden="true">
+            <span class="sq-actor"><b>Client</b><small>agent · wallet</small></span>
+            <span class="sq-actor eve"><b>Intermediary</b><small>cdn · gateway</small></span>
+            <span class="sq-actor"><b>Seller</b><small>resource server</small></span>
+            <span class="sq-actor"><b>Facilitator</b><small>verify · settle</small></span>
+          </div>
+          <div id="sq-rows" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="readout" id="sq-readout" aria-hidden="true"></div>
+    </div>
   </div>
 </section>
 
 <section id="how">
-  <div class="wrap">
-    <p class="label">How it works</p>
+  <div class="wrap reveal">
+    <p class="label">02 · <b>How it works</b></p>
     <h2>Four steps on top of the existing <code>exact</code> scheme</h2>
     <p class="sub">No new payment scheme and no change to the facilitator. The extension adds fields to the 402 and the payment payload, and replaces the response body with an envelope.</p>
     <div class="steps">
-      <div class="card step"><div class="n">01</div><h3>Attest</h3><p>The seller signs its encryption key once with the <code>payTo</code> key (EIP-712, EIP-1271 for contracts). This can be done offline.</p></div>
-      <div class="card step"><div class="n">02</div><h3>Commit</h3><p>The client checks the attestation against the <code>payTo</code> it pays, then commits a per-request ephemeral key and the request hash into the signed nonce.</p></div>
-      <div class="card step"><div class="n">03</div><h3>Check</h3><p>Before settlement the seller recomputes the commitment from the request it received. A changed key, body, path or URL is rejected, and nothing settles.</p></div>
-      <div class="card step"><div class="n">04</div><h3>Encrypt</h3><p>The seller encrypts the response to that key. The client decrypts it. Lost responses are resent byte for byte from storage, without a second charge.</p></div>
+      <div class="card step"><div class="n"><span>01</span><span>seller</span></div><h3>Attest</h3><p>The seller signs its encryption key once with the <code>payTo</code> key (EIP-712, EIP-1271 for contracts). This can be done offline.</p><span class="bar"></span></div>
+      <div class="card step"><div class="n"><span>02</span><span>client</span></div><h3>Commit</h3><p>The client checks the attestation against the <code>payTo</code> it pays, then commits a per-request key and the request hash into the signed nonce.</p><span class="bar"></span></div>
+      <div class="card step"><div class="n"><span>03</span><span>seller</span></div><h3>Check</h3><p>Before settlement the seller recomputes the commitment from the request it received. A changed key, body, path or URL is refused and nothing settles.</p><span class="bar"></span></div>
+      <div class="card step"><div class="n"><span>04</span><span>both</span></div><h3>Encrypt</h3><p>The seller encrypts the response to that key and the client decrypts it. A lost response is resent byte for byte from storage, with no second charge.</p><span class="bar"></span></div>
     </div>
   </div>
 </section>
 
 <section id="log">
-  <div class="wrap">
-    <p class="label">What the intermediary records</p>
-    <h2>Same request, same proxy log</h2>
-    <p class="sub">The response body of the Base Sepolia demo as a relaying proxy sees it, without and with the extension. The envelope values are shortened for display. The request body <code>{"quarter":"Q3"}</code> stays visible in both cases: the extension covers responses.</p>
-    <div class="compare">
-      <div class="card">
-        <div class="head"><span><span class="dot" style="background:var(--bad)"></span>plain x402</span><span>200 application/json</span></div>
-        <pre>{"report":"Q3 revenue by region",
- "apac":412000,"emea":388000,"amer":951000}</pre>
+  <div class="wrap reveal">
+    <p class="label">03 · <b>What the intermediary records</b></p>
+    <h2>Same call, same proxy log</h2>
+    <p class="sub">A logging reverse proxy relays the demo request. Switch the tab to compare its log without and with the extension. The request body stays visible in both: the extension covers responses.</p>
+    <div class="card" style="overflow:hidden">
+      <div class="bar-top">
+        <div class="tabs" role="tablist">
+          <button role="tab" aria-selected="true" data-mode="plain" type="button"><span class="dot" style="background:var(--bad)"></span>plain x402</button>
+          <button role="tab" aria-selected="false" data-mode="enc" type="button"><span class="dot" style="background:var(--ok)"></span>with response encryption</button>
+        </div>
+        <span>proxy access log</span>
       </div>
-      <div class="card">
-        <div class="head"><span><span class="dot" style="background:var(--ok)"></span>with response encryption</span><span>200 application/x402-encrypted+json</span></div>
-        <pre>{"version":1,"keyId":"0xc6dbedfc…c27a",
- "status":200,"contentType":"application/json",
- "iv":"k8RBzFOEIHHj5nXe",
- "ciphertext":"asl8SsPf3lP87dPTnQaFNnTf--hrdLfk1Qoml…"}</pre>
-      </div>
+      <pre class="log-body" id="proxylog"></pre>
+      <div class="verdict" id="verdict"></div>
+    </div>
+  </div>
+</section>
+
+<section id="lab">
+  <div class="wrap reveal">
+    <p class="label">04 · <b>Try an attack</b></p>
+    <h2>Pick what the intermediary tampers with</h2>
+    <p class="sub">Each case is one the reference tests or test vectors run. The outcomes and reason codes are the ones the proposal defines.</p>
+    <div class="lab">
+      <div class="card attacks" id="attacks"></div>
+      <div class="card lab-out"><div class="bar-top"><span id="lab-title">seller</span><span>result</span></div><pre id="lab-out"></pre></div>
     </div>
   </div>
 </section>
 
 <section id="profiles">
-  <div class="wrap">
-    <p class="label">Payment schemes</p>
+  <div class="wrap reveal">
+    <p class="label">05 · <b>Payment schemes</b></p>
     <h2>The binding does not depend on EIP-3009</h2>
     <p class="sub">The commitment goes in whichever client-chosen field the payment signature covers. Each profile fixes where it sits, which digest salts the key derivation, and how the seller checks the signature locally.</p>
     <div class="card table">
@@ -235,13 +368,13 @@ footer a { color: var(--muted); }
 </section>
 
 <section id="quickstart">
-  <div class="wrap">
-    <p class="label">Quick start</p>
+  <div class="wrap reveal">
+    <p class="label">06 · <b>Quick start</b></p>
     <h2>Seller middleware and a client fetch wrapper</h2>
     <p class="sub">The reference packages wrap the official <code>@x402/express</code> middleware and run in this repository's workspace. They are not published to npm.</p>
     <div class="qs">
       <div class="card code">
-        <div class="bar"><span>1 · run the tests and the testnet demo</span><button class="copy">Copy</button></div>
+        <div class="bar-top"><span>1 · tests and the testnet demo</span><button class="iconbtn copy" type="button">copy</button></div>
 <pre>git clone https://github.com/code0xff/x402-response-encryption
 cd x402-response-encryption && npm install
 npm test
@@ -249,38 +382,38 @@ npm run demo           <span class="c"># EIP-3009 on Base Sepolia, needs a funde
 npm run demo:permit2   <span class="c"># Permit2</span></pre>
       </div>
       <div class="card code">
-        <div class="bar"><span>2 · seller (Express)</span><button class="copy">Copy</button></div>
-<pre>import { createResponseEncryption } from '@x402-response-encryption/express';
+        <div class="bar-top"><span>2 · seller (Express)</span><button class="iconbtn copy" type="button">copy</button></div>
+<pre><span class="kw">import</span> { createResponseEncryption } <span class="kw">from</span> <span class="st">'@x402-response-encryption/express'</span>;
 
-const enc = createResponseEncryption({ keys: [{ privateKey, attestation }] });
+<span class="kw">const</span> enc = createResponseEncryption({ keys: [{ privateKey, attestation }] });
 resourceServer.registerExtension(enc.extension);
 
 app.use(enc.before);                     <span class="c">// binding check before settlement</span>
 app.use(paymentMiddleware({
-  'POST /v1/report': { accepts, extensions: enc.declaration },
+  <span class="st">'POST /v1/report'</span>: { accepts, extensions: enc.declaration },
 }, resourceServer));
 app.use(enc.after);                      <span class="c">// encrypts the paid response</span>
-app.post('/v1/report', (req, res) =&gt; res.json(report));</pre>
+app.post(<span class="st">'/v1/report'</span>, (req, res) =&gt; res.json(report));</pre>
       </div>
       <div class="card code">
-        <div class="bar"><span>3 · client</span><button class="copy">Copy</button></div>
-<pre>import { wrapFetchWithEncryptedPayment } from '@x402-response-encryption/fetch';
+        <div class="bar-top"><span>3 · client</span><button class="iconbtn copy" type="button">copy</button></div>
+<pre><span class="kw">import</span> { wrapFetchWithEncryptedPayment } <span class="kw">from</span> <span class="st">'@x402-response-encryption/fetch'</span>;
 
-const pay = wrapFetchWithEncryptedPayment(fetch, { signer, pinnedPayTo });
-const res = await pay('https://api.seller.example/v1/report', { method: 'POST', body });
-console.log(await res.json());           <span class="c">// decrypted; plaintext from the network is refused</span></pre>
+<span class="kw">const</span> pay = wrapFetchWithEncryptedPayment(fetch, { signer, pinnedPayTo });
+<span class="kw">const</span> res = <span class="kw">await</span> pay(<span class="st">'https://api.seller.example/v1/report'</span>, { method: <span class="st">'POST'</span>, body });
+console.log(<span class="kw">await</span> res.json());           <span class="c">// decrypted; plaintext from the network is refused</span></pre>
       </div>
     </div>
   </div>
 </section>
 
 <section id="scope">
-  <div class="wrap">
-    <p class="label">Scope</p>
+  <div class="wrap reveal">
+    <p class="label">07 · <b>Scope</b></p>
     <h2>What it protects, and what it does not</h2>
     <div class="two">
       <div class="card">
-        <h3>Protected</h3>
+        <h3><svg class="i" style="color:var(--ok)"><use href="#i-lock"/></svg>Protected</h3>
         <ul>
           <li><b>Response bodies</b> from every party between seller and client, including the payment gateway in a gateway deployment.</li>
           <li><b>Key substitution:</b> swapping the client's key breaks the payment signature and the seller refuses before settlement.</li>
@@ -289,7 +422,7 @@ console.log(await res.json());           <span class="c">// decrypted; plaintext
         </ul>
       </div>
       <div class="card">
-        <h3>Not covered</h3>
+        <h3><svg class="i" style="color:var(--muted)"><use href="#i-eye"/></svg>Not covered</h3>
         <ul>
           <li>Request bodies, headers and the URL. They stay visible to anything that terminates TLS.</li>
           <li>Metadata: who paid whom, how much, when, and the response size.</li>
@@ -302,8 +435,8 @@ console.log(await res.json());           <span class="c">// decrypted; plaintext
 </section>
 
 <section id="evidence">
-  <div class="wrap">
-    <p class="label">Evidence</p>
+  <div class="wrap reveal">
+    <p class="label">08 · <b>Evidence</b></p>
     <h2>Reproducible, not just specified</h2>
     <p class="sub">Test vectors are generated in TypeScript and reproduced by an independent Python verifier. End-to-end tests run the real x402 middleware behind a logging proxy and behind a relaying gateway.</p>
     <div class="card table">
@@ -321,14 +454,25 @@ console.log(await res.json());           <span class="c">// decrypted; plaintext
 </section>
 
 <section id="faq">
-  <div class="wrap">
-    <p class="label">FAQ</p>
+  <div class="wrap reveal">
+    <p class="label">09 · <b>FAQ</b></p>
     <h2>Questions</h2>
-    <details><summary>Isn't TLS enough?</summary><p>TLS ends at the first party that terminates it. A CDN, a reverse proxy or a payment gateway in front of the seller reads and can log or cache the response. For an agent buying financial or personal data, that party may not be the one it paid.</p></details>
+    <details><summary>Isn't TLS enough?</summary><p>TLS ends at the first party that terminates it. A CDN, a reverse proxy or a payment gateway in front of the seller reads the response and can log or cache it. For an agent buying financial or personal data, that party may not be the one it paid.</p></details>
     <details><summary>Does the facilitator need to change?</summary><p>No. The commitment is an ordinary nonce or memo to the facilitator. The seller checks it before asking the facilitator to settle.</p></details>
     <details><summary>Does the client's wallet need new features?</summary><p>No. The ephemeral key is generated by the client library, not the wallet. The wallet signs the same EIP-3009, Permit2 or Solana payment it signs today.</p></details>
     <details><summary>What happens if the encrypted response is lost?</summary><p>The client resends the identical paid request. The seller returns the envelope it stored after settlement, byte for byte, and does not settle or run the request again.</p></details>
     <details><summary>Is this part of x402?</summary><p>Not yet. It is a design draft submitted for discussion in <a href="https://github.com/x402-foundation/x402/issues/4223">x402-foundation/x402#4223</a>. Comments and reviews are welcome there.</p></details>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="wrap reveal">
+    <h2>Review the design, run the vectors, break it if you can.</h2>
+    <p class="sub">Feedback goes to the proposal issue. Code, vectors and the full specification are in the repository.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/code0xff/x402-response-encryption"><svg class="i"><use href="#i-github"/></svg>code0xff/x402-response-encryption</a>
+      <a class="btn" href="https://github.com/x402-foundation/x402/issues/4223"><svg class="i"><use href="#i-issue"/></svg>Discuss on #4223</a>
+    </div>
   </div>
 </section>
 </main>
@@ -336,16 +480,242 @@ console.log(await res.json());           <span class="c">// decrypted; plaintext
 <footer>
   <div class="wrap">
     <span class="mono">x402-response-encryption · v1 draft · secp256k1-hkdf-sha256-aes256gcm</span>
-    <span><a href="https://github.com/code0xff/x402-response-encryption">GitHub</a> · <a href="https://github.com/x402-foundation/x402/issues/4223">#4223</a> · Apache-2.0 · Fonts: Pretendard, JetBrains Mono (SIL OFL 1.1)</span>
+    <span class="fl">
+      <a href="https://github.com/code0xff/x402-response-encryption"><svg class="i"><use href="#i-github"/></svg>GitHub</a>
+      <a href="https://github.com/x402-foundation/x402/issues/4223"><svg class="i"><use href="#i-issue"/></svg>#4223</a>
+      <span>Apache-2.0 · Fonts: Pretendard, JetBrains Mono (SIL OFL 1.1)</span>
+    </span>
   </div>
 </footer>
 
 <script>
-document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', async () => {
-  const text = b.closest('.code').querySelector('pre').innerText;
-  try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; } catch { b.textContent = 'Select to copy'; }
-  setTimeout(() => (b.textContent = 'Copy'), 1500);
-}));
+(() => {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sleep = (ms) => new Promise((r) => setTimeout(r, still ? 0 : ms));
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+  /* reveal on scroll */
+  const secs = document.querySelectorAll('.reveal');
+  if (still || !('IntersectionObserver' in window)) secs.forEach((s) => s.classList.add('in'));
+  else {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+    secs.forEach((s) => io.observe(s));
+  }
+  const onView = (el, fn) => {
+    if (still || !('IntersectionObserver' in window)) return fn();
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: .3 });
+    io.observe(el);
+  };
+
+  /* headline: "read." scrambles into ciphertext and back */
+  const swap = document.getElementById('swap');
+  const hx = '0123456789abcdef';
+  const noise = () => '<span class="cipher">' + Array.from({ length: 5 }, () => hx[Math.random() * 16 | 0]).join('') + '</span>';
+  (async () => {
+    if (still) return;
+    for (;;) {
+      await sleep(3800);
+      for (let i = 0; i < 10; i++) { swap.innerHTML = noise(); await sleep(55); }
+      swap.innerHTML = '<span class="cipher">0x9f3a…</span>';
+      await sleep(1400);
+      for (let i = 0; i < 8; i++) { swap.innerHTML = noise(); await sleep(55); }
+      swap.textContent = 'read.';
+    }
+  })();
+
+  /* typewriter terminal: the shape of `npm run demo:permit2` output, addresses elided */
+  const term = document.getElementById('term');
+  const T = [
+    ['cmd', 'npm run demo:permit2'],
+    ['m', 'facilitator in-process'],
+    ['', 'client 0x…  USDC 19.92'],
+    ['', 'asset transfer method: permit2'],
+    ['gap'],
+    ['step', '→ POST /v1/report          402  key attested by payTo ✓'],
+    ['step', '→ nonce = c = keccak256(tag ‖ E ‖ keyId ‖ requestHash ‖ r)'],
+    ['step', '→ POST /v1/report (paid)   200  x402-encrypted+json'],
+    ['gap'],
+    ['ok', 'client decrypted: { report: "Q3 revenue by region", … }'],
+    ['', 'settlement tx:    0x4a422231…ec174b'],
+    ['gap'],
+    ['', 'intermediary log:'],
+    ['m', '  {"quarter":"Q3"}'],
+    ['m', '  {"version":1,"keyId":"0x…","iv":"…","ciphertext":"…"}'],
+    ['gap'],
+    ['okb', 'plaintext in intermediary log: no'],
+    ['', 'client USDC 19.91'],
+  ];
+  let termRun = 0;
+  const caret = '<span class="caret"></span>';
+  const playTerm = async () => {
+    const id = ++termRun;
+    term.innerHTML = '';
+    for (const [kind, text] of T) {
+      if (id !== termRun) return;
+      if (kind === 'gap') { term.insertAdjacentHTML('beforeend', '<div class="ln">&nbsp;</div>'); await sleep(140); continue; }
+      if (kind === 'cmd') {
+        const ln = document.createElement('div');
+        term.appendChild(ln);
+        for (let i = 0; i <= text.length; i++) {
+          if (id !== termRun) return;
+          ln.innerHTML = '<span class="t-p">$ </span>' + esc(text.slice(0, i)) + caret;
+          await sleep(40 + Math.random() * 45);
+        }
+        await sleep(500);
+        ln.innerHTML = '<span class="t-p">$ </span>' + esc(text);
+        continue;
+      }
+      const cls = { m: 't-m', step: 't-m', ok: 't-ok', okb: 't-ok t-b' }[kind] || '';
+      term.insertAdjacentHTML('beforeend', `<div class="ln ${cls}">${esc(text)}</div>`);
+      await sleep(kind === 'step' ? 650 : 170);
+    }
+    if (id === termRun) term.insertAdjacentHTML('beforeend', '<div><span class="t-p">$ </span>' + caret + '</div>');
+  };
+  document.getElementById('term-replay').addEventListener('click', playTerm);
+  playTerm();
+
+  /* sequence diagram */
+  const X = [10, 37, 64, 90];
+  document.querySelectorAll('.sq-actor').forEach((a, i) => (a.style.left = X[i] + '%'));
+  const rows = [
+    { a: [0, 1], t: 'POST /v1/report', say: '<span class="k">client</span> asks for the resource, unpaid' },
+    { a: [1, 2], t: 'POST /v1/report', say: 'the <span class="k">intermediary</span> relays it to the seller' },
+    { a: [2, 0], t: '402 · key M attested by payTo', dash: 1, say: '<span class="k">seller</span> answers 402 with its encryption key, signed by <span class="k">payTo</span>' },
+    { note: 0, lft: 1, t: 'check attestation · new (e, E)', say: '<span class="k">client</span> checks the attestation against the payTo it pays and makes a one-time key' },
+    { note: 0, lft: 1, t: 'nonce = c(E, keyId, requestHash, r)', say: '<span class="k">client</span> signs the payment with the commitment as its nonce' },
+    { a: [0, 2], t: 'paid request · E, r', say: 'the paid request crosses the <span class="k">intermediary</span>, which cannot swap E without breaking the signature' },
+    { note: 2, r: 1, t: 'recompute c = nonce?', say: '<span class="k">seller</span> recomputes c from the request it received, before any settlement' },
+    { a: [2, 3], t: 'settle', say: 'the <span class="k">facilitator</span> verifies and settles the payment' },
+    { a: [3, 2], t: 'settled', ok: 1, dash: 1, say: 'payment settled on-chain' },
+    { note: 2, r: 1, t: 'K = HKDF(ECDH(m, E), digest)', say: '<span class="k">seller</span> derives a one-time AES-256-GCM key and encrypts the body' },
+    { a: [2, 0], t: '200 · encrypted envelope', dash: 1, enc: 1, say: 'the <span class="k">intermediary</span> relays ciphertext only' },
+    { note: 0, lft: 1, t: 'decrypt with e', say: '<span class="k">client</span> derives the same key and decrypts. Nobody in between could.' },
+  ];
+  const sqRows = document.getElementById('sq-rows');
+  const readout = document.getElementById('sq-readout');
+  const actors = [...document.querySelectorAll('.sq-actor')];
+  sqRows.innerHTML = rows.map((r) => {
+    if ('note' in r) {
+      const x = X[r.note] + (r.r ? -1.5 : r.lft ? 1.5 : 0);
+      return `<div class="sq-msg"><span class="sq-note hid${r.r ? ' r' : ''}${r.lft ? ' lft' : ''}" style="--x:${x}%">${esc(r.t)}</span></div>`;
+    }
+    const [f, t] = r.a, l = Math.min(X[f], X[t]), w = Math.abs(X[t] - X[f]), dir = t > f ? 'r' : 'l';
+    return `<div class="sq-msg" style="--l:${l}%;--w:${w}%;--o:${dir === 'r' ? 'left' : 'right'}"><span class="sq-arrow hid ${dir}${r.dash ? ' dash' : ''}"></span><span class="sq-label hid${r.ok ? ' ok' : ''}${r.enc ? ' enc' : ''}">${esc(r.t)}</span></div>`;
+  }).join('');
+  let sqRun = 0;
+  const typeInto = async (el, html, id) => {
+    const tmp = document.createElement('div'); tmp.innerHTML = html;
+    const plain = tmp.textContent;
+    for (let i = 0; i <= plain.length; i += 2) {
+      if (sqRun !== id) return;
+      el.innerHTML = esc(plain.slice(0, i)) + caret;
+      await sleep(12);
+    }
+    el.innerHTML = html + caret;
+  };
+  const playSeq = async () => {
+    const id = ++sqRun;
+    sqRows.querySelectorAll('.sq-arrow, .sq-label, .sq-note').forEach((e) => { e.classList.add('hid'); e.classList.remove('play'); });
+    readout.innerHTML = caret;
+    for (const [i, r] of rows.entries()) {
+      if (id !== sqRun) return;
+      actors.forEach((a) => a.classList.remove('hit'));
+      (r.a || [r.note]).forEach((k) => actors[k].classList.add('hit'));
+      sqRows.children[i].querySelectorAll('.hid').forEach((e) => { e.classList.remove('hid'); void e.offsetWidth; e.classList.add('play'); });
+      await typeInto(readout, `<span class="k">${String(i + 1).padStart(2, '0')}</span>  ${r.say}`, id);
+      await sleep(900);
+    }
+    actors.forEach((a) => a.classList.remove('hit'));
+  };
+  document.getElementById('sq-replay').addEventListener('click', playSeq);
+  onView(document.getElementById('sq'), playSeq);
+
+  /* proxy log */
+  const logEl = document.getElementById('proxylog');
+  const verdict = document.getElementById('verdict');
+  const L = {
+    plain: [
+      ['m', '→ POST /v1/report  content-type: application/json'],
+      ['', '  {"quarter":"Q3"}'],
+      ['m', '← 402  payment-required: eyJ4NDAyVmVyc2lvbiI6Mi…'],
+      ['m', '→ POST /v1/report  payment-signature: eyJ4NDAyVmVyc2lvbiI6Mi…'],
+      ['', '  {"quarter":"Q3"}'],
+      ['m', '← 200  content-type: application/json'],
+      ['leak', '  {"report":"Q3 revenue by region","apac":412000,"emea":388000,"amer":951000}'],
+    ],
+    enc: [
+      ['m', '→ POST /v1/report  content-type: application/json'],
+      ['', '  {"quarter":"Q3"}'],
+      ['m', '← 402  payment-required: eyJ4NDAyVmVyc2lvbiI6Mi…  (+ seller key, attestation)'],
+      ['m', '→ POST /v1/report  payment-signature: eyJ4NDAyVmVyc2lvbiI6Mi…  (+ E, r; nonce = c)'],
+      ['', '  {"quarter":"Q3"}'],
+      ['m', '← 200  content-type: application/x402-encrypted+json'],
+      ['sealed', '  {"version":1,"keyId":"0xc6dbedfc…c27a","status":200,"contentType":"application/json",\n   "iv":"k8RBzFOEIHHj5nXe","ciphertext":"asl8SsPf3lP87dPTnQaFNnTf--hrdLfk1QomlnkCkFoK…"}'],
+    ],
+  };
+  let logRun = 0, mode = 'plain';
+  const playLog = async () => {
+    const id = ++logRun;
+    logEl.innerHTML = ''; verdict.innerHTML = '';
+    for (const [k, t] of L[mode]) {
+      if (id !== logRun) return;
+      const body = k === 'leak' ? `<span class="leak">${esc(t)}</span>` : k === 'sealed' ? `<span class="sealed">${esc(t)}</span>` : esc(t);
+      logEl.insertAdjacentHTML('beforeend', `<div class="ln${k === 'm' ? ' t-m' : ''}">${body}</div>`);
+      await sleep(k === 'm' ? 260 : 380);
+    }
+    if (id !== logRun) return;
+    verdict.innerHTML = mode === 'plain'
+      ? '<span class="dot" style="background:var(--bad)"></span><span style="color:var(--bad)">paid data recorded in plaintext by a party that did not pay for it</span>'
+      : '<span class="dot" style="background:var(--ok)"></span><span style="color:var(--ok)">only ciphertext recorded · request body visible, as scoped</span>';
+  };
+  document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    mode = b.dataset.mode; playLog();
+  }));
+  onView(logEl, playLog);
+
+  /* attack lab: outcomes and codes from the proposal (7.4, 10.2, A.6) */
+  const A = [
+    { k: 'A1', t: 'Swap the ephemeral key', s: 'replace E in the payment payload', where: 'seller · before settlement',
+      out: [['m', 'recompute c from E, keyId, requestHash, r'], ['m', 'signed nonce ≠ recomputed c'], ['bad', '402  response_encryption_nonce_mismatch'], ['ok', 'not settled · handler not run']] },
+    { k: 'A2', t: 'Rewrite the nonce to match', s: 'swap E and put the new c in the nonce', where: 'seller / facilitator',
+      out: [['m', 'the nonce is inside the signed authorization'], ['m', 'the signature no longer recovers the payer'], ['bad', 'invalid_exact_evm_payload_signature · invalid_permit2_signature'], ['ok', 'not settled']] },
+    { k: 'A3', t: 'Change the request', s: 'alter the body, path, query or method', where: 'seller · before settlement',
+      out: [['m', 'requestHash covers method, canonical URL and body'], ['bad', '402  response_encryption_nonce_mismatch'], ['ok', 'not settled · handler not run']] },
+    { k: 'A4', t: 'Swap the seller key in the 402', s: 'serve the client an attacker key', where: 'client · before paying',
+      out: [['m', 'the attestation must be signed by the payTo being paid'], ['bad', 'response_encryption_attestation_invalid'], ['ok', 'client does not pay']] },
+    { k: 'A5', t: 'Strip the extension', s: 'drop response-encryption from the payload', where: 'seller · before settlement',
+      out: [['m', 'a covered resource requires the extension'], ['bad', '402  response_encryption_extension_missing'], ['ok', 'not settled · no plaintext fallback']] },
+    { k: 'A6', t: 'Tamper with the envelope', s: 'flip bits in ciphertext, IV, tag or AAD', where: 'client · after delivery',
+      out: [['m', 'AES-256-GCM tag over ciphertext and AAD'], ['bad', 'response_encryption_decrypt_failed'], ['ok', 'nothing released to the caller']] },
+    { k: 'A7', t: 'Replace payTo, key and attestation', s: 'redirect the payment to the attacker', where: 'client',
+      out: [['m', 'a self-consistent attacker 402, which plain x402 already permits'], ['w', 'core profile: the client pays the substituted payTo (proposal 4.3)'], ['ok', 'pinned payTo or did:web profile: the client does not pay']] },
+  ];
+  const atk = document.getElementById('attacks'), out = document.getElementById('lab-out'), title = document.getElementById('lab-title');
+  atk.innerHTML = A.map((a, i) => `<button type="button" data-i="${i}" aria-pressed="false"><span class="k">${a.k}</span><span>${esc(a.t)}<small>${esc(a.s)}</small></span></button>`).join('');
+  let labRun = 0;
+  const playLab = async (i) => {
+    const id = ++labRun, a = A[i];
+    atk.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.i === i)));
+    title.textContent = a.where; out.innerHTML = '';
+    out.insertAdjacentHTML('beforeend', `<div class="ln t-m"><span class="t-p">$ </span>attack ${a.k.toLowerCase()} · ${esc(a.t.toLowerCase())}</div>`);
+    for (const [k, t] of a.out) {
+      await sleep(340);
+      if (id !== labRun) return;
+      const cls = { m: 't-m', bad: 't-bad', ok: 't-ok t-b', w: 't-w' }[k];
+      const pre = { m: '  · ', bad: '  ✕ ', ok: '  ✓ ', w: '  ! ' }[k];
+      out.insertAdjacentHTML('beforeend', `<div class="ln ${cls}">${pre}${esc(t)}</div>`);
+    }
+  };
+  atk.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) playLab(+b.dataset.i); });
+  onView(atk, () => playLab(0));
+
+  /* copy buttons */
+  document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(b.closest('.code').querySelector('pre').innerText); b.textContent = 'copied'; } catch { b.textContent = 'select to copy'; }
+    setTimeout(() => (b.textContent = 'copy'), 1500);
+  }));
+})();
 </script>
 </body>
 </html>
