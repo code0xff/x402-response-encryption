@@ -194,7 +194,7 @@ A profile for a payment scheme fixes:
 
 **EIP-3009** (normative, implemented, 3.1). The signed commitment is `authorization.nonce`. `authorizationDigest` is the EIP-712 digest of `TransferWithAuthorization` under the token's domain, and the local check recovers `from` from the signature (EIP-1271 for contract wallets).
 
-The two profiles below follow from the x402 `exact` specifications for [EVM][x402-exact-evm] and [SVM][x402-exact-svm]. Both have test vectors and an independent verifier (A.9). Permit2 is also implemented in the reference packages and settled on Base Sepolia (10.2); SVM is not implemented.
+The two profiles below follow from the x402 `exact` specifications for [EVM][x402-exact-evm] and [SVM][x402-exact-svm]. Both have test vectors and an independent verifier (A.9). Permit2 is also implemented in the reference packages and settled on Base Sepolia (10.2). For SVM, `packages/core` implements the extraction rule, `authorizationDigest` and the local ed25519 check and runs the SVM vectors; the client wrapper, seller middleware and attestation are not implemented.
 
 **Permit2** (`exact` on EVM, `assetTransferMethod: "permit2"`). `c` is `permit2Authorization.nonce`, read as a big-endian `uint256` (the payload carries it as a decimal string). Permit2 accepts any `uint256` as a signature-transfer nonce: it splits the value into a 248-bit word index and an 8-bit bit index of a per-owner bitmap, so distinct values never collide [Permit2][permit2-sig]. x402's Go client already fills this field with 32 random bytes, and x402's `auth-capture` EVM client already puts a computed hash in it rather than random bytes. The witness is not an option: x402's `x402ExactPermit2Proxy` fixes it as `Witness(address to,uint256 validAfter)`. `authorizationDigest` is the EIP-712 digest of `PermitWitnessTransferFrom`, witness included, under the Permit2 domain. The local check recovers `permit2Authorization.from` from that digest, or validates it with EIP-1271 when `from` is a contract, as Permit2 itself does. An invalid signature surfaces as `invalid_permit2_signature`. The attestation is unchanged, since `payTo` is an EVM address.
 
@@ -594,13 +594,13 @@ Seller-side forward secrecy would need the seller to use a per-response ephemera
 
 | Component | Path |
 | --- | --- |
-| Primitives: URL canonicalization, nonce binding, attestation, envelope, EIP-3009 and Permit2 profiles (3.5) | `packages/core` |
+| Primitives: URL canonicalization, nonce binding, attestation, envelope, EIP-3009 and Permit2 profiles, and the SVM extraction rule, digest and signature check (3.5) | `packages/core` |
 | Client `fetch` wrapper: key check, EIP-3009 or Permit2 signing with the commitment as nonce, decryption, plaintext refusal | `packages/fetch` |
 | Seller middleware on `@x402/express` (deployment A), origin middleware behind a gateway (deployment B), envelope storage | `packages/express` |
 | Test vectors and an independent Python verifier sharing no code with the generator | `test-vectors` |
 | Base Sepolia demo through a logging reverse proxy, EIP-3009 or Permit2 (`--permit2`) | `examples/base-sepolia` |
 
-Scope: `exact` on Base Sepolia with EIP-3009 or Permit2, EOA payers and `payTo`, single JSON responses. The Permit2 path is tested end to end in both deployments. SVM has vectors only. The did:web profile is covered by test vectors (DID document and its cases) but the client wrapper does not resolve DID documents.
+Scope: `exact` on Base Sepolia with EIP-3009 or Permit2, EOA payers and `payTo`, single JSON responses. The Permit2 path is tested end to end in both deployments. For SVM only the core profile functions exist, checked against the SVM vectors; there is no SVM payment end to end. The core SVM reader requires a top-level `TransferChecked` whose mint and destination are static account keys: it does not read a smart-wallet transfer made through CPI, nor accounts loaded from address lookup tables. The did:web profile is covered by test vectors (DID document and its cases) but the client wrapper does not resolve DID documents.
 
 ### 10.2 Results
 
@@ -664,7 +664,7 @@ On Base Sepolia the demo settled a real payment through an in-process facilitato
 3. **Key operations**: done (4.4). Recommended values (10-minute grace, 90-day rotation) need checking against real `maxTimeoutSeconds` settings.
 4. **did:web profile and marketplace domains**: the profile matches the DID against the URL the client requested (4.5), so a seller served under a marketplace or API-gateway domain fails the check. Proposed fix: an `origins` list in the DID document's `x402ResponseEncryption` property naming the origins the seller authorizes. Deferred until the core extension gets feedback.
 5. **Extension schema and error codes**: done (7.4, `schemas/`). Codes still need review against x402 naming once maintainers comment.
-6. **Scheme profiles**: the binding is scheme-independent (3.1), with Permit2 (nonce) and Solana (memo) profiles defined in 3.5. Test vectors for both are in A.9. Permit2 is implemented and settled on Base Sepolia. Remaining: an SVM implementation and an ed25519 attestation format for Solana `payTo`.
+6. **Scheme profiles**: the binding is scheme-independent (3.1), with Permit2 (nonce) and Solana (memo) profiles defined in 3.5. Test vectors for both are in A.9. Permit2 is implemented and settled on Base Sepolia. The SVM extraction rule, digest and local check are implemented in core. Remaining: an ed25519 attestation format for Solana `payTo`, then the SVM client and seller paths.
 7. **Retries and settlement**: done (8.1). The 24-hour retention minimum is a starting point for discussion.
 8. **Request body encryption (follow-up extension)**: this proposal leaves requests in plaintext. A follow-up could encrypt the request body to the seller key with the same ECDH construction. It needs four things:
    - **Key before the first request.** The unpaid request that triggers the 402 is sent before the client sees any key. The client would get the key ahead of time, for example from the did:web document (4.5) or a key cached from an earlier exchange.

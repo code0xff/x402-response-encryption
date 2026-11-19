@@ -14,6 +14,9 @@ import {
   openResponse,
   paymentView,
   sealResponse,
+  svmPaymentView,
+  base58Encode,
+  base58Decode,
   toHex,
   transferAuthorizationTypedData,
   utf8Bytes,
@@ -32,6 +35,7 @@ const vector = load('vector-1.json');
 const negative = load('negative-cases.json');
 const urlCases = load('url-cases.json');
 const permit2 = load('vector-permit2.json');
+const svm = load('vector-svm.json');
 
 const chainIdOf = (caip2: string) => Number(caip2.split(':')[1]);
 
@@ -228,6 +232,102 @@ describe('vector-permit2 (proposal 3.5, A.9)', () => {
       expect(reason).toBe(c.expect?.reason ?? null);
     });
   }
+});
+
+describe('vector-svm (proposal 3.5, A.9)', () => {
+  const { inputs, intermediate, output, cases } = svm;
+  const seller = sellerKeyFromPrivate(fromHex(inputs.sellerEncryptionPrivateKey));
+
+  it('extracts c, the digest and the transfer, and the envelope decrypts', async () => {
+    const valid = cases.find((c: { id: string }) => c.id === 'valid').wire;
+    const view = svmPaymentView(valid.payload)!;
+    expect(view.method).toBe('svm');
+    expect(view.commitment).toBe(intermediate.commitment);
+    expect(toHex(view.digest)).toBe(intermediate.authorizationDigest);
+    expect(view.from).toBe(intermediate.clientOwner);
+    expect(view.to).toBe(inputs.accounts.destinationAta);
+    expect(view.token).toBe(inputs.accounts.mint);
+    expect(view.value).toBe(BigInt(inputs.amount));
+    expect(await view.signerMatches()).toBe(true);
+    const bound = checkBinding(valid.extension as PaymentPayloadInfo, {
+      signedCommitment: view.commitment!,
+      request: valid.request,
+      keys: [seller],
+    });
+    const env = sealResponse(bound, inputs.network, view.digest, {
+      status: inputs.response.status,
+      contentType: inputs.response.contentType,
+      body: utf8Bytes(inputs.response.body),
+    }, fromHex(inputs.iv));
+    expect(env).toEqual(output.envelope);
+  });
+
+  for (const c of cases) {
+    it(`case ${c.id}`, async () => {
+      const view = svmPaymentView(c.wire.payload)!;
+      expect(view).toBeDefined();
+      let reason: string | null = null;
+      if (!(await view.signerMatches())) reason = 'invalid_exact_svm_payload_signature_invalid';
+      else if (!view.commitment) reason = 'response_encryption_nonce_mismatch';
+      else {
+        try {
+          checkBinding(c.wire.extension, { signedCommitment: view.commitment, request: c.wire.request, keys: [seller] });
+        } catch (err) {
+          reason = (err as ResponseEncryptionError).reason;
+        }
+      }
+      expect(reason).toBe(c.expect?.reason ?? null);
+    });
+  }
+
+  it('rejects malformed transactions', () => {
+    expect(svmPaymentView({ transaction: 'AQ==' })).toBeUndefined();
+    expect(svmPaymentView({ transaction: 'not base64!' })).toBeUndefined();
+    expect(svmPaymentView({})).toBeUndefined();
+  });
+
+  const validTx = () => Buffer.from(cases.find((c: { id: string }) => c.id === 'valid').wire.payload.transaction, 'base64');
+  const asPayload = (b: Uint8Array) => ({ transaction: Buffer.from(b).toString('base64') });
+
+  it('rejects a non-canonical compact-u16 signature count', () => {
+    const tx = validTx();
+    expect(tx[0]).toBe(2);
+    expect(svmPaymentView(asPayload(Buffer.concat([Buffer.from([0x82, 0x00]), tx.subarray(1)])))).toBeUndefined();
+  });
+
+  it('accepts only a memo of exactly 64 lowercase hex bytes', async () => {
+    const tx = validTx();
+    const hex = Buffer.from(intermediate.memo);
+    const at = tx.indexOf(hex);
+    expect(at).toBeGreaterThan(0);
+    // Prefix a UTF-8 BOM inside the memo data (length byte 64 -> 67).
+    expect(tx[at - 1]).toBe(64);
+    const withBom = Buffer.concat([tx.subarray(0, at - 1), Buffer.from([67, 0xef, 0xbb, 0xbf]), tx.subarray(at)]);
+    const view = svmPaymentView(asPayload(withBom));
+    expect(view?.commitment).toBeUndefined();
+  });
+
+  it('refuses a small-order authority key with a forged signature', async () => {
+    const tx = validTx();
+    const view = svmPaymentView(asPayload(tx))!;
+    const authority = Buffer.from(base58Decode(view.from));
+    const keyAt = tx.indexOf(authority);
+    const identity = Buffer.alloc(32);
+    identity[0] = 1; // encoded identity point
+    const forged = Buffer.from(tx);
+    identity.copy(forged, keyAt);
+    // Signature R = identity, S = 0 at the authority's signature slot (index 1).
+    const sig = Buffer.alloc(64);
+    sig[0] = 1;
+    sig.copy(forged, 1 + 64);
+    const v = svmPaymentView(asPayload(forged))!;
+    expect(v.from).toBe(base58Encode(identity));
+    expect(await v.signerMatches()).toBe(false);
+  });
+
+  it('base58 round-trips program ids and leading zeros', () => {
+    expect(base58Encode(new Uint8Array(32))).toBe('11111111111111111111111111111111');
+  });
 });
 
 describe('bytes', () => {

@@ -2,7 +2,7 @@
 
 A proposed [x402](https://github.com/x402-foundation/x402) extension that lets only the paying client read a paid response.
 
-An x402 response usually crosses CDNs, reverse proxies, API gateways or marketplaces that terminate TLS and can log or cache it in plaintext. With this extension the seller encrypts the response body to a per-request ephemeral key that the client commits into a field its payment signature covers: the `nonce` for EIP-3009 and Permit2, a memo for Solana (vectors only). The seller's encryption key carries an attestation signed by `payTo`. An intermediary cannot swap either key without breaking the payment signature or redirecting the payment on-chain.
+An x402 response usually crosses CDNs, reverse proxies, API gateways or marketplaces that terminate TLS and can log or cache it in plaintext. With this extension the seller encrypts the response body to a per-request ephemeral key that the client commits into a field its payment signature covers: the `nonce` for EIP-3009 and Permit2, a memo for Solana (core functions and vectors; no end-to-end path yet). The seller's encryption key carries an attestation signed by `payTo`. An intermediary cannot swap either key without breaking the payment signature or redirecting the payment on-chain.
 
 Status: design draft. Nothing here has been adopted into the x402 specification.
 
