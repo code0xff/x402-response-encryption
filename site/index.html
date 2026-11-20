@@ -228,6 +228,28 @@ footer a { color: var(--muted); text-decoration: none; display: inline-flex; ali
 footer a:hover { color: var(--text); }
 footer .fl { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
 
+
+/* mobile */
+html, body { overflow-x: clip; }
+.lab > *, .two > *, .steps > *, .wrap > * { min-width: 0; }
+@media (max-width: 600px) {
+  section { padding: 48px 0; }
+  .hero { padding: 40px 0; }
+  .lead { font-size: 15px; }
+  .sub { margin-bottom: 24px; }
+  .term-body { height: 340px; font-size: 11px; padding: 12px; }
+  .log-body, .lab-out pre { font-size: 11px; padding: 12px; }
+  .code pre { font-size: 11.5px; }
+  .term-bar .path { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .cta .btn { flex: 1 1 auto; justify-content: center; }
+  nav.links { gap: 10px; }
+  table { font-size: 13px; }
+  .brand { font-size: 13px; }
+  header.top .wrap { gap: 12px; }
+  nav.links a.gh .t, nav.links a.iss .t { display: none; }
+  nav.links a.gh { padding: 6px 8px; }
+  th, td { padding: 8px 10px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1 !important; transform: none !important; }
   .caret, .sq .play, .ln, .tag .live, .step .bar { animation: none !important; }
@@ -254,8 +276,8 @@ footer .fl { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
       <a class="opt" href="#lab">Try an attack</a>
       <a class="opt" href="#profiles">Schemes</a>
       <a class="opt" href="#quickstart">Quick start</a>
-      <a href="https://github.com/x402-foundation/x402/issues/4223" aria-label="Proposal issue #4223"><svg class="i"><use href="#i-issue"/></svg>#4223</a>
-      <a class="gh" href="https://github.com/code0xff/x402-response-encryption" aria-label="GitHub repository"><svg class="i"><use href="#i-github"/></svg>GitHub</a>
+      <a class="iss" href="https://github.com/x402-foundation/x402/issues/4223" aria-label="Proposal issue #4223"><svg class="i"><use href="#i-issue"/></svg><span class="t">#4223</span></a>
+      <a class="gh" href="https://github.com/code0xff/x402-response-encryption" aria-label="GitHub repository"><svg class="i"><use href="#i-github"/></svg><span class="t">GitHub</span></a>
     </nav>
   </div>
 </header>
