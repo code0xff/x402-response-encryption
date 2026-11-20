@@ -75,7 +75,8 @@ nav.links a.gh:hover { border-color: var(--muted); }
 .tag { border: 1px solid var(--border); background: var(--surface); padding: 2px 8px; border-radius: 6px; font: 500 12px var(--mono); color: var(--muted); }
 .tag .live { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); margin-right: 6px; vertical-align: 1px; animation: pulse 2s infinite; }
 h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.08; letter-spacing: -0.03em; margin: 20px 0 18px; font-weight: 600; }
-h1 .cipher { font-family: var(--mono); font-weight: 500; letter-spacing: -0.04em; color: var(--muted); }
+#swap { display: inline-block; white-space: nowrap; text-align: left; vertical-align: bottom; }
+h1 .cipher { color: var(--muted); }
 .lead { font-size: 17px; color: var(--muted); max-width: 56ch; margin: 0 0 28px; }
 .cta { display: flex; gap: 10px; flex-wrap: wrap; }
 .btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--border);
@@ -532,13 +533,16 @@ console.log(<span class="kw">await</span> res.json());           <span class="c"
   /* headline: "read." scrambles into ciphertext and back */
   const swap = document.getElementById('swap');
   const hx = '0123456789abcdef';
+  // Lock the word's box to the width of "read." so the scramble never reflows the headline.
+  const lock = () => { const t = swap.innerHTML; swap.style.width = ''; swap.textContent = 'read.'; swap.style.width = swap.getBoundingClientRect().width + 'px'; swap.innerHTML = t; };
+  lock(); addEventListener('resize', lock); document.fonts?.ready.then(lock);
   const noise = () => '<span class="cipher">' + Array.from({ length: 5 }, () => hx[Math.random() * 16 | 0]).join('') + '</span>';
   (async () => {
     if (still) return;
     for (;;) {
       await sleep(3800);
       for (let i = 0; i < 10; i++) { swap.innerHTML = noise(); await sleep(55); }
-      swap.innerHTML = '<span class="cipher">0x9f3a…</span>';
+      swap.innerHTML = '<span class="cipher">f3a9…</span>';
       await sleep(1400);
       for (let i = 0; i < 8; i++) { swap.innerHTML = noise(); await sleep(55); }
       swap.textContent = 'read.';
